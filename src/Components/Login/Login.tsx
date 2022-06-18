@@ -4,7 +4,7 @@ import { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { useNavigate } from 'react-router-dom';
 import FinalInputText from '../../_commons/FinalForm/InputText';
-import onBoardImage from '../../Assets/mar-logo.jpg';
+import onBoardImage from '../../assets/mar-logo.jpg';
 import './Login.scss';
 import AuthRequestDto from '../../Services/Auth/dto/AuthRequestDto';
 
