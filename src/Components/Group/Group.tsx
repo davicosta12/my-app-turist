@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useContext, useEffect, useRef, useState } from 'react';
 
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -8,16 +8,20 @@ import { Card } from 'primereact/card';
 import MapComponent from '../../_commons/MapComponent/MapComponent';
 import MapDialog from '../../_commons/MapDialog/MapDialog';
 import GroupForm from './Detail/Detail';
+import { ThemeContext, toastError, toastSuccess } from '../../Misc/utils';
+import GetGroupDto from '../../Services/Group/dto/GetGroupDto';
+import PostGroupDto from '../../Services/Group/dto/PostGroupDto';
+import { InputText } from 'primereact/inputtext';
+import GroupService from '../../Services/Group/GroupService';
 
 interface Props {
+
 }
 
-export interface GetGroupDto {
-  id: number;
-  name: string;
-  description: string;
-  email: string;
-  document: string;
+export interface Params {
+  id: string,
+  guideName: string,
+  place: string
 }
 
 const Group: FunctionComponent<Props> = (props) => {
@@ -29,21 +33,102 @@ const Group: FunctionComponent<Props> = (props) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [createModa, setCreateMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useContext(ThemeContext).toast;
+  const groupService = new GroupService(localStorage.getItem('token'));
+  const inputRef = useRef<any>(null);
 
-  const getGroups = () => {
+  const [filterParams, setFilterParams] = useState<Params>({
+    id: '',
+    guideName: '',
+    place: ''
+  });
 
+  useEffect(() => {
+    getGroups();
+  }, []);
+
+  const getGroups = async () => {
+    setIsLoading(true);
+    try {
+      const groups = await groupService.getGroups(filterParams);
+      setGroups([...groups]);
+    }
+    catch (err: any) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
   }
 
-  const handleCreateGroup = (group: GetGroupDto) => {
-
+  const handleCreateGroup = async (values: PostGroupDto) => {
+    setIsLoading(true);
+    try {
+      await groupService.createGroup(values);
+      await getGroups();
+      setOpenDetail(false);
+      toast?.current?.show(toastSuccess('Grupo adicionado com sucesso'));
+    }
+    catch (err) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
   }
 
-  const handleUpdateGroup = (group: GetGroupDto) => {
-
+  const handleUpdateGroup = async (values: GetGroupDto) => {
+    setIsLoading(true);
+    try {
+      await groupService.updateGroup(values, values.id);
+      await getGroups();
+      setOpenDetail(false);
+      toast?.current?.show(toastSuccess('Grupo atualizado com sucesso'));
+    }
+    catch (err) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
   }
 
-  const handleDeleteGroup = (group: GetGroupDto) => {
+  const handleDeleteGroup = async (values: GetGroupDto) => {
+    setIsLoading(true);
+    try {
+      await groupService.deleteGroup(group.id);
+      await getGroups();
+      setOpenDetail(false);
+      toast?.current?.show(toastSuccess('Grupo excluído com sucesso'));
+    }
+    catch (err) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
 
+  const handleKeyPressInput = async (ev: any) => {
+    if (ev.key === 'Enter') await getGroups();
+  }
+
+  const handleChange = (ev: any) => {
+    setFilterParams({ ...filterParams, [ev.target.name]: ev.target.value })
+  }
+
+  const handleSearchBtn = async () => {
+    setGroup({} as GetGroupDto);
+    await getGroups();
+  }
+
+  const handleClearBtn = () => {
+    setFilterParams({
+      id: '',
+      guideName: '',
+      place: ''
+    });
+    inputRef?.current?.focus();
   }
 
   const handleEdit = (group: GetGroupDto) => {
@@ -106,25 +191,92 @@ const Group: FunctionComponent<Props> = (props) => {
       </section>
 
       <section className='board-section surface-0 mt-5'>
-        <div className='flex justify-content-end p-4'>
-          <Button
-            label='Adicionar Grupo'
-            icon="pi pi-plus"
-            className='p-button-sm p-button-primary'
-            onClick={handleAdd}
-          />
+        <div className='p-4'>
+          <div className='grid p-0 m-0'>
+            <div className='col-12 lg:col-9 p-0 m-0'>
+              <div className='grid p-0 m-0'>
+                <div className="col-12 lg:col-3">
+                  <InputText
+                    ref={inputRef}
+                    name="id"
+                    value={filterParams?.id}
+                    placeholder="Id"
+                    className="inputfield p-inputtext-sm w-full text-sm"
+                    onChange={handleChange}
+                    onKeyPress={handleKeyPressInput}
+                    autoComplete='off'
+                    autoFocus
+                  />
+                </div>
+                <div className="col-12 lg:col-3">
+                  <InputText
+                    name="guideName"
+                    value={filterParams?.guideName}
+                    placeholder="Nome do Guia"
+                    className="inputfield p-inputtext-sm w-full text-sm"
+                    onChange={handleChange}
+                    onKeyPress={handleKeyPressInput}
+                    autoComplete='off'
+                  />
+                </div>
+                <div className="col-12 lg:col-3">
+                  <InputText
+                    name="place"
+                    value={filterParams?.place}
+                    placeholder="Lugar"
+                    className="inputfield p-inputtext-sm w-full text-sm"
+                    onChange={handleChange}
+                    onKeyPress={handleKeyPressInput}
+                    autoComplete='off'
+                  />
+                </div>
+                <div className="flex col-12 lg:col-3">
+                  <Button
+                    label='Pesquisar'
+                    className='lg:flex-grow-0 flex-grow-1 p-button-sm p-button-primary'
+                    disabled={isLoading}
+                    onClick={handleSearchBtn}
+                  />
+                  <Button
+                    label='Limpar'
+                    className='lg:flex-grow-0 flex-grow-1 p-button-sm p-button-secondary ml-2'
+                    disabled={isLoading || (!filterParams.id && !filterParams.guideName && !filterParams.id)}
+                    onClick={handleClearBtn}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className='flex col-12 lg:col-3 justify-content-end'>
+              <Button
+                icon="pi pi-refresh"
+                className="p-button-sm p-button-secondary"
+                onClick={getGroups}
+                loading={isLoading}
+                tooltip="Atualizar"
+                tooltipOptions={{ position: 'top' }}
+              />
+              <Button
+                label='Adicionar Grupo'
+                icon="pi pi-plus"
+                className='lg:flex-grow-0 flex-grow-1 p-button-sm p-button-primary ml-2'
+                onClick={handleAdd}
+              />
+            </div>
+          </div>
         </div>
-      </section>
+      </section >
 
       <div className="datatable-div mt-5">
         <DataTable
-          data={groupsFake}
+          data={groups}
           dataKey='id'
           paginator
+          loading={isLoading}
         >
-          <Column field="name" header="Nome" filter filterField="name" filterPlaceholder="Pesquise pelo nome"></Column>
-          <Column field="description" header="Descrição"></Column>
-          <Column field="email" header="Email"></Column>
+          <Column field="id" header="ID Grupo"></Column>
+          <Column field="place" header="Lugar"></Column>
+          <Column body={(rowData: GetGroupDto) => rowData.guide.name} header="Nome do Guia"></Column>
+          <Column field="imageUrl" header="Url da Imagem"></Column>
           <Column body={actionsBodyTemplate}></Column>
         </DataTable>
       </div>
@@ -138,6 +290,7 @@ const Group: FunctionComponent<Props> = (props) => {
       <GroupForm
         group={group}
         openDetail={openDetail}
+        loading={isLoading}
         createMode={createModa}
         onCreate={handleCreateGroup}
         onUpdate={handleUpdateGroup}
@@ -146,7 +299,7 @@ const Group: FunctionComponent<Props> = (props) => {
 
       <ConfirmDialog
         visible={openConfirm}
-        header={`Remover Grupo "${group.name}"`}
+        header={`Remover Grupo "${group.id}"`}
         message='Deseja realmente remover este Grupo?'
         icon="pi pi-info-circle"
         acceptLabel="Sim"
@@ -160,12 +313,5 @@ const Group: FunctionComponent<Props> = (props) => {
 
 export default Group;
 
-const groupsFake = new Array(30).fill(0)
-  .map((g, i) => Object.assign({}, {
-    id: i + 1,
-    name: `Grupo ${i + 1}`,
-    description: 'informação qualquer',
-    email: `grupo${i + 1}@hotmail.com`,
-    document: '51189115832'
-  }));
+
 

@@ -3,9 +3,9 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Field, Form } from 'react-final-form';
 import { createForm } from 'final-form';
-import { GetGroupDto } from '../Group';
 import { GroupValidators } from './validators';
 import FinalInputText from '../../../_commons/FinalForm/InputText';
+import GetGroupDto from '../../../Services/Group/dto/GetGroupDto';
 
 interface Props {
   group: GetGroupDto;
@@ -83,23 +83,16 @@ const GroupForm: FunctionComponent<Props> = props => {
             <div className="formgrid grid">
               <div className="field col-12 lg:col-6">
                 <Field
-                  name="name"
-                  label="Nome"
+                  name="place"
+                  label="Lugar"
                   component={FinalInputText}
                   required
                 />
               </div>
               <div className="field col-12 lg:col-6">
                 <Field
-                  name="email"
-                  label="Email"
-                  component={FinalInputText}
-                />
-              </div>
-              <div className="field col-12">
-                <Field
-                  name="description"
-                  label="Descrição"
+                  name="imageUrl"
+                  label="Url da Imagem"
                   component={FinalInputText}
                 />
               </div>

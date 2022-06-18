@@ -3,10 +3,10 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Field, Form } from 'react-final-form';
 import { createForm } from 'final-form';
-import { GetGuideDto } from '../Guide';
 import { GuideValidators } from './validators';
 import FinalInputText from '../../../_commons/FinalForm/InputText';
 import FinalInputMask from '../../../_commons/FinalForm/InputMask';
+import GetGuideDto from '../../../Services/Guide/dto/GetGuideDto';
 
 interface Props {
   guide: GetGuideDto;
@@ -101,15 +101,15 @@ const GuideForm: FunctionComponent<Props> = props => {
               </div>
               <div className="field col-12 lg:col-6">
                 <Field
-                  name="email"
-                  label="Email"
+                  name="cellphone"
+                  label="Celular"
                   component={FinalInputText}
                 />
               </div>
               <div className="field col-12 lg:col-6">
                 <Field
-                  name="description"
-                  label="Descrição"
+                  name="city"
+                  label="Cidade"
                   component={FinalInputText}
                 />
               </div>

@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useContext, useEffect, useState } from 'react';
 import './Home.scss';
 import GroupContent from '../../_commons/GroupContent/GroupContent';
 import { Button } from 'primereact/button';
@@ -6,20 +6,50 @@ import { Galleria } from 'primereact/galleria';
 
 import onBoardHome from '../../assets/home-logo.jpg';
 import onSerchHome from '../../assets/search.jpg';
-import onGroup5 from '../../assets/group-5.jpg';
-import onGroup6 from '../../assets/group-6.jpg';
+import { ThemeContext, toastError } from '../../Misc/utils';
+import Groupservice from '../../Services/Group/GroupService';
+import { Params } from '../Group/Group';
+import GetGroupDto from '../../Services/Group/dto/GetGroupDto';
+import { MAX_GROUP_LENGHT } from '../../Env/env';
 
 interface Props {
 }
 
 const Home: FunctionComponent<Props> = (props) => {
 
+  const [groups, setGroups] = useState<GetGroupDto[]>([]);
+  const [pneultGroup, setPneultGroup] = useState({} as GetGroupDto);
+  const [lastGroup, setLastGroup] = useState({} as GetGroupDto);
+  const [touristsLength, setTouristsLength] = useState(0);
   const [images, setImages] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useContext(ThemeContext).toast;
+  const groupService = new Groupservice(localStorage.getItem('token'));
 
   useEffect(() => {
     setImages([...imageData]);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    getGroups();
+  }, []);
+
+  const getGroups = async () => {
+    setIsLoading(true);
+    try {
+      const groups = await groupService.getGroups({} as Params);
+      setGroups([...groups]);
+      setPneultGroup({ ...groups[groups.length - 2] });
+      setLastGroup({ ...groups[groups.length - 1] });
+    }
+    catch (err: any) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
 
   const responsiveOptions = [
     {
@@ -47,6 +77,49 @@ const Home: FunctionComponent<Props> = (props) => {
   const thumbnailTemplate = (item: any) => {
     return <img src={require(`../../assets/${item.thumbnailImageSrc}`)} alt={item.alt} style={{ width: '80px', height: '60px', display: 'block' }
     } />
+  }
+
+  const getGroupNumberComplete = (turistLength: number) => {
+    if (turistLength) {
+
+      if (turistLength > MAX_GROUP_LENGHT) {
+        return MAX_GROUP_LENGHT;
+      }
+      else if (turistLength < MAX_GROUP_LENGHT) {
+        return MAX_GROUP_LENGHT - turistLength;
+      }
+      else {
+        return 0;
+      }
+
+    }
+
+    return 0;
+  }
+
+  const getGroupLabelComplete = (turistLength: number) => {
+
+    if (turistLength) {
+      let _completeLabel = '';
+
+      switch (turistLength) {
+        case 1: _completeLabel = 'um'; break;
+        case 2: _completeLabel = 'dois'; break;
+        case 3: _completeLabel = 'três'; break;
+        case 4: _completeLabel = 'quatro'; break;
+        case 5: _completeLabel = 'cinco'; break;
+        case 6: _completeLabel = 'seis'; break;
+        case 7: _completeLabel = 'sete'; break;
+        case 8: _completeLabel = 'oito'; break;
+        case 9: _completeLabel = 'nove'; break;
+        case 10: _completeLabel = 'dez'; break;
+        default: break;
+      }
+
+      return _completeLabel;
+    }
+
+    return 'Seja o primeiro a completar o grupo';
   }
 
   return (
@@ -83,67 +156,35 @@ const Home: FunctionComponent<Props> = (props) => {
             </div>
           </div>
 
-
           <hr className='hr-spacing'></hr>
 
-          <GroupContent
-            country='Roma (Itália)'
-            guideName='André Ferreira'
-            groupInformation='8/10 (Faltam duas pessoas para completar o grupo)'
-            groupNumber={1}
-            imageUrl='group-1.jpg'
-            alt='Imagem-Grupo1'
-          />
+          {groups.slice(0, groups.length - 2).map((item: GetGroupDto, i: number) => <>
+            <GroupContent
+              country={item.place}
+              guideName={item.guide.name}
+              groupInformation={`${getGroupNumberComplete(item.turists?.length)}/10 (Faltam ${getGroupLabelComplete(item.turists?.length)} pessoas para completar o grupo)`}
+              groupNumber={i + 1}
+              imageUrl={item.imageUrl}
+              alt={`Imagem-Grupo${i + 1}`}
+            />
 
-          <hr className='hr-spacing'></hr>
-
-          <GroupContent
-            country='Jericoacoara (Fortaleza)'
-            guideName='Lucas Silva '
-            groupInformation='6/10 (Faltam quatro pessoas para completar o grupo)'
-            groupNumber={2}
-            imageUrl='group-2.jpg'
-            alt='Imagem-Grupo2'
-          />
-
-          <hr className='hr-spacing'></hr>
-
-          <GroupContent
-            country='Viagem: Los Angeles (California)'
-            guideName='Rebeca Lima'
-            groupInformation='5/10 (Faltam cinco pessoas para completar o grupo)'
-            groupNumber={3}
-            imageUrl='group-3.jpg'
-            alt='Imagem-Grupo3'
-          />
-
-          <hr className='hr-spacing'></hr>
-
-          <GroupContent
-            country='Bora Bora (Polinésia Francesa)'
-            guideName='Manuella Souza '
-            groupInformation='9/10 (Faltam uma pessoa para completar o grupo)'
-            groupNumber={4}
-            imageUrl='group-4.jpg'
-            alt='Imagem-Grupo4'
-          />
-
-          <hr className='hr-spacing'></hr>
+            <hr className='hr-spacing'></hr>
+          </>)}
 
           <div className='w-auto lg:flex justify-content-between'>
             <div className='w-12 lg:w-6'>
               <div>
                 <img
-                  src={onGroup5}
-                  alt='Imagem-Grupo5'
+                  src={require(`../../assets/${pneultGroup?.imageUrl || 'defaultImg.jpg'}`)}
+                  alt={`Imagem-Grupo${groups.length - 1}`}
                   width='100%'
                   height='562.41px'
                 />
               </div>
               <div className='w-full lg:ml-4 lg:mt-3'>
-                <h2 className='title-styles'>{`Grupo 5 - Viagem: Maui(Havaí)`}</h2>
-                <p className='paragraph-styles'>{`Guia: Roberto Gomes `}</p>
-                <p className='paragraph-styles'>{`Grupo: 4/10 (Faltam seis pessoas para completar o grupo)`}</p>
+                <h2 className='title-styles'>{`Grupo ${groups.length - 1} - Viagem: ${pneultGroup.place}`}</h2>
+                <p className='paragraph-styles'>{`Guia: ${pneultGroup.guide?.name}`}</p>
+                <p className='paragraph-styles'>{`Grupo: ${getGroupNumberComplete(pneultGroup.turists?.length)}/10 (Faltam ${getGroupLabelComplete(pneultGroup.turists?.length)} pessoas para completar o grupo)`}</p>
               </div>
               <div className='text-right mt-5'>
                 <Button
@@ -156,16 +197,16 @@ const Home: FunctionComponent<Props> = (props) => {
             <div className='w-12 lg:w-6 lg:ml-5 mt-3 lg:mt-0'>
               <div>
                 <img
-                  src={onGroup6}
-                  alt='Imagem-Grupo6'
+                  src={require(`../../assets/${lastGroup?.imageUrl || 'defaultImg.jpg'}`)}
+                  alt={`Imagem-Grupo${groups.length}`}
                   width='100%'
                   height='562.41px'
                 />
               </div>
               <div className='w-full lg:ml-4 lg:mt-3'>
-                <h2 className='title-styles'>{`Grupo  6 - Barcelona (Espanha)`}</h2>
-                <p className='paragraph-styles'>{`Guia: Isabella Nunes`}</p>
-                <p className='paragraph-styles'>{`Grupo: 7/10 (Faltam três pessoas para completar o grupo)`}</p>
+                <h2 className='title-styles'>{`Grupo ${groups.length} - Viagem: ${lastGroup.place}`}</h2>
+                <p className='paragraph-styles'>{`Guia: ${lastGroup.guide?.name}`}</p>
+                <p className='paragraph-styles'>{`Grupo: ${getGroupNumberComplete(lastGroup.turists?.length)}/10 (Faltam ${getGroupLabelComplete(lastGroup.turists?.length)} pessoas para completar o grupo)`}</p>
               </div>
               <div className='text-right mt-5'>
                 <Button
@@ -179,31 +220,43 @@ const Home: FunctionComponent<Props> = (props) => {
 
           <hr className='hr-spacing'></hr>
 
-          <div className='w-auto lg:flex'>
-            <div className='w-12 lg:w-5'>
-              <Galleria
-                value={images}
-                activeIndex={activeIndex}
-                onItemChange={(e) => setActiveIndex(e.index)}
-                responsiveOptions={responsiveOptions}
-                numVisible={2}
-                circular
-                autoPlay
-                transitionInterval={5000}
-                style={{ maxWidth: '800px' }}
-                item={itemTemplate}
-                thumbnail={thumbnailTemplate} />
+          <div>
+            <div className='w-auto lg:flex'>
+              <div className='w-12 lg:w-5'>
+                <Galleria
+                  value={images}
+                  activeIndex={activeIndex}
+                  onItemChange={(e) => setActiveIndex(e.index)}
+                  responsiveOptions={responsiveOptions}
+                  numVisible={2}
+                  circular
+                  autoPlay
+                  transitionInterval={5000}
+                  style={{ maxWidth: '800px' }}
+                  item={itemTemplate}
+                  thumbnail={thumbnailTemplate} />
+              </div>
+              <div className='w-12 lg:w-7 lg:ml-4 lg:mt-6'>
+                <h2 className='title-styles'>Confira as viagens mais procuradas pelo mundo:</h2>
+                <p className='paragraph-styles'>Estas viagens já estão com grupos fechados, porém fiquem espertos para não perderem esta oportunidade em sua próxima viagem!</p>
+              </div>
             </div>
-            <div className='w-12 lg:w-7 lg:ml-4 lg:mt-6'>
-              <h2 className='title-styles'>Confira as viagens mais procuradas pelo mundo:</h2>
-              <p className='paragraph-styles'>Estas viagens já estão com grupos fechados, porém fiquem espertos para não perderem esta oportunidade em sua próxima viagem!</p>
+            <div className='text-right mt-5'>
+              <Button
+                label='Localizações'
+                icon="fa-solid fa-location-dot"
+                className='p-button-sm p-button-primary'
+              />
             </div>
           </div>
-
         </div>
-      </div>
-    </div >
 
+      </div>
+
+      {/* <GroupForm
+
+      /> */}
+    </div >
   );
 };
 

@@ -1,7 +1,6 @@
 import { FunctionComponent } from 'react';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
-import { GetGuideDto } from '../../Components/Guide/Guide';
 import MapComponent from '../MapComponent/MapComponent';
 
 

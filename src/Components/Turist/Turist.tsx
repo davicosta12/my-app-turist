@@ -267,7 +267,7 @@ const Turist: FunctionComponent<Props> = (props) => {
             </div>
           </div>
         </div>
-      </section >
+      </section>
 
       <div className="datatable-div mt-5">
         <DataTable
