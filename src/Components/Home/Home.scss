@@ -1,0 +1,19 @@
+.home-container {
+
+}
+.home-logo-container {
+    height: 340px;
+    padding-bottom: 56px;
+    padding-top: 56px;
+    background-size: cover;
+    display: table;
+    position: relative;
+    table-layout: fixed;
+    width: 100%;
+
+    .home-logo {
+        background-size: cover;
+        background-position: center center;
+        transform: translate3d(0px, 0px, 0px);
+    }
+}

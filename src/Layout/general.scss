@@ -1,0 +1,62 @@
+body {
+  margin: 0;
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f0f0f0;
+}
+
+code {
+  font-family: "Roboto", source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.board-section {
+  background: #ffffff 0% 0% no-repeat padding-box !important;
+  box-shadow: 0px 6px 9px #00000029 !important;
+  border-radius: 16px !important;
+  opacity: 1 !important;
+}
+
+.board-spacing {
+  margin: 2rem 2rem;
+}
+
+.title-styles {
+  font-size: 1.75rem;
+  color: #707070;
+  margin: 0 0 2rem 0;
+  text-align: left;
+}
+
+.p-button-xs {
+  font-size: 0.875rem !important;
+  padding: 0.4775rem 0.65625rem !important;
+  width: 30px !important;
+  height: 28px !important;
+  border-radius: 4px !important;
+  .pi {
+    font-size: 0.9rem !important;
+  }
+  .svg-inline--fa {
+    font-size: 0.9rem !important;
+  }
+}
+
+.p-card {
+  background: #ffffff 0% 0% no-repeat padding-box !important;
+  box-shadow: 0px 6px 9px #00000029 !important;
+  border-radius: 16px !important;
+  opacity: 1 !important;
+
+  .p-card-title {
+    color: #707070;
+  }
+}
+
+
+.p-calendar {
+  button {
+    padding: 0 !important;
+  }
+}
