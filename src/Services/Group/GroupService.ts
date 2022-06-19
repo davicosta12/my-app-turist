@@ -46,6 +46,14 @@ export default class GroupService extends HttpService {
     });
   }
 
+  patchGroup(value: any, id: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getApi().patch(`/groups/${id}`, value)
+        .then((res: any) => resolve(res.data))
+        .catch((err: AxiosResponse<any>) => reject(err))
+    });
+  }
+
   deleteGroup(id: number): Promise<any> {
     return new Promise((resolve, reject) => {
       this.getApi().delete(`/groups/${id}`)

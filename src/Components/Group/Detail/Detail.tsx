@@ -6,9 +6,15 @@ import { createForm } from 'final-form';
 import { GroupValidators } from './validators';
 import FinalInputText from '../../../_commons/FinalForm/InputText';
 import GetGroupDto from '../../../Services/Group/dto/GetGroupDto';
+import FinalDropdown from '../../../_commons/FinalForm/DropDown';
+import GetGuideDto from '../../../Services/Guide/dto/GetGuideDto';
+import FinalListbox from '../../../_commons/FinalForm/ListBox';
+import GetTuristDto from '../../../Services/Turist/dto/GetTuristDto';
 
 interface Props {
   group: GetGroupDto;
+  guides: GetGuideDto[];
+  turists: GetTuristDto[];
   openDetail: boolean;
   createMode: boolean;
   loading?: boolean;
@@ -27,6 +33,8 @@ const GroupForm: FunctionComponent<Props> = props => {
     loading,
     openDetail,
     group,
+    guides,
+    turists,
   } = props;
 
   const formRef = useRef(createForm({
@@ -81,7 +89,25 @@ const GroupForm: FunctionComponent<Props> = props => {
           footer={() => renderFooter(renderProps.values, renderProps.valid, renderProps.pristine)}
         >
             <div className="formgrid grid">
-              <div className="field col-12 lg:col-6">
+              {!createMode && <div className="field col-12 lg:col-3">
+                <Field
+                  name="id"
+                  label="Id Grupo"
+                  component={FinalInputText}
+                  required
+                  readOnly
+                />
+              </div>}
+              <div className={`field col-12 ${!createMode ? "lg:col-4" : "lg:col-6"}`}>
+                <Field
+                  name="guide"
+                  label="Guia"
+                  options={guides.map((item: GetGuideDto) => Object.assign({}, { label: item.name, value: item }))}
+                  component={FinalDropdown}
+                  required
+                />
+              </div>
+              <div className={`field col-12 ${!createMode ? "lg:col-5" : "lg:col-6"}`}>
                 <Field
                   name="place"
                   label="Lugar"
@@ -89,11 +115,13 @@ const GroupForm: FunctionComponent<Props> = props => {
                   required
                 />
               </div>
-              <div className="field col-12 lg:col-6">
+              <div className="field col-12 lg:col-12">
                 <Field
-                  name="imageUrl"
-                  label="Url da Imagem"
-                  component={FinalInputText}
+                  name="turists"
+                  label="Turistas"
+                  options={turists.map((item: GetTuristDto) => Object.assign({}, { label: item.name, value: item }))}
+                  component={FinalListbox}
+                  required
                 />
               </div>
             </div>

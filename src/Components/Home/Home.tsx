@@ -80,17 +80,12 @@ const Home: FunctionComponent<Props> = (props) => {
   }
 
   const getGroupNumberComplete = (turistLength: number) => {
+    
     if (turistLength) {
 
-      if (turistLength > MAX_GROUP_LENGHT) {
-        return MAX_GROUP_LENGHT;
-      }
-      else if (turistLength < MAX_GROUP_LENGHT) {
-        return MAX_GROUP_LENGHT - turistLength;
-      }
-      else {
-        return 0;
-      }
+      return turistLength >= MAX_GROUP_LENGHT
+        ? MAX_GROUP_LENGHT
+        : turistLength;
 
     }
 
@@ -99,27 +94,28 @@ const Home: FunctionComponent<Props> = (props) => {
 
   const getGroupLabelComplete = (turistLength: number) => {
 
+    let _completeLabel = '';
+
     if (turistLength) {
-      let _completeLabel = '';
 
       switch (turistLength) {
-        case 1: _completeLabel = 'um'; break;
-        case 2: _completeLabel = 'dois'; break;
-        case 3: _completeLabel = 'três'; break;
-        case 4: _completeLabel = 'quatro'; break;
+        case 1: _completeLabel = 'nove'; break;
+        case 2: _completeLabel = 'oito'; break;
+        case 3: _completeLabel = 'sete'; break;
+        case 4: _completeLabel = 'seis'; break;
         case 5: _completeLabel = 'cinco'; break;
-        case 6: _completeLabel = 'seis'; break;
-        case 7: _completeLabel = 'sete'; break;
-        case 8: _completeLabel = 'oito'; break;
-        case 9: _completeLabel = 'nove'; break;
+        case 6: _completeLabel = 'quatro'; break;
+        case 7: _completeLabel = 'três'; break;
+        case 8: _completeLabel = 'dois'; break;
+        case 9: _completeLabel = 'um'; break;
         case 10: _completeLabel = 'dez'; break;
         default: break;
       }
-
-      return _completeLabel;
     }
 
-    return 'Seja o primeiro a completar o grupo';
+    return _completeLabel
+      ? `Faltam ${_completeLabel} pessoas para completar o grupo`
+      : `Seja o primeiro a participar do grupo`;
   }
 
   return (
@@ -162,7 +158,7 @@ const Home: FunctionComponent<Props> = (props) => {
             <GroupContent
               country={item.place}
               guideName={item.guide.name}
-              groupInformation={`${getGroupNumberComplete(item.turists?.length)}/10 (Faltam ${getGroupLabelComplete(item.turists?.length)} pessoas para completar o grupo)`}
+              groupInformation={`${getGroupNumberComplete(item.turists?.length)}/10 (${getGroupLabelComplete(item.turists?.length)})`}
               groupNumber={i + 1}
               imageUrl={item.imageUrl}
               alt={`Imagem-Grupo${i + 1}`}
@@ -184,7 +180,7 @@ const Home: FunctionComponent<Props> = (props) => {
               <div className='w-full lg:ml-4 lg:mt-3'>
                 <h2 className='title-styles'>{`Grupo ${groups.length - 1} - Viagem: ${pneultGroup.place}`}</h2>
                 <p className='paragraph-styles'>{`Guia: ${pneultGroup.guide?.name}`}</p>
-                <p className='paragraph-styles'>{`Grupo: ${getGroupNumberComplete(pneultGroup.turists?.length)}/10 (Faltam ${getGroupLabelComplete(pneultGroup.turists?.length)} pessoas para completar o grupo)`}</p>
+                <p className='paragraph-styles'>{`Grupo: ${getGroupNumberComplete(pneultGroup.turists?.length)}/10 (${getGroupLabelComplete(pneultGroup.turists?.length)})`}</p>
               </div>
               <div className='text-right mt-5'>
                 <Button
@@ -206,7 +202,7 @@ const Home: FunctionComponent<Props> = (props) => {
               <div className='w-full lg:ml-4 lg:mt-3'>
                 <h2 className='title-styles'>{`Grupo ${groups.length} - Viagem: ${lastGroup.place}`}</h2>
                 <p className='paragraph-styles'>{`Guia: ${lastGroup.guide?.name}`}</p>
-                <p className='paragraph-styles'>{`Grupo: ${getGroupNumberComplete(lastGroup.turists?.length)}/10 (Faltam ${getGroupLabelComplete(lastGroup.turists?.length)} pessoas para completar o grupo)`}</p>
+                <p className='paragraph-styles'>{`Grupo: ${getGroupNumberComplete(lastGroup.turists?.length)}/10 (${getGroupLabelComplete(lastGroup.turists?.length)})`}</p>
               </div>
               <div className='text-right mt-5'>
                 <Button

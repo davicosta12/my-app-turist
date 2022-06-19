@@ -47,6 +47,14 @@
       "birthDate": "2000-02-12T03:00:00.000Z",
       "genrer": "Masculino",
       "cellphone": "972884011"
+    },
+    {
+      "name": "dadawdadadad",
+      "document": "511.891.158-32",
+      "birthDate": "2022-06-01T03:00:00.000Z",
+      "cellphone": "dawdad",
+      "genrer": "Masculino",
+      "id": 7
     }
   ],
   "guides": [
@@ -110,7 +118,6 @@
   "groups": [
     {
       "id": 1,
-      "idGroup": "G1",
       "place": "Roma Itália",
       "imageUrl": "group-1.jpg",
       "guide": {
@@ -123,33 +130,40 @@
       "turists": [
         {
           "id": 1,
-          "document": "43702853804",
-          "name": "Xavier",
-          "birthDate": "13/01/2000",
+          "name": "Xavierrr",
+          "birthDate": "2000-06-13T03:00:00.000Z",
           "genrer": "Masculino",
-          "cellphone": "972884044"
+          "cellphone": "972884044",
+          "document": "511.891.158-32"
         },
         {
-          "id": 2,
-          "document": "53702853804",
-          "name": "Davi",
-          "birthDate": "13/05/2000",
+          "id": 5,
+          "document": "83702853804",
+          "name": "Christian",
+          "birthDate": "2000-05-13T03:00:00.000Z",
           "genrer": "Masculino",
-          "cellphone": "9753423235"
+          "cellphone": "972544054"
         },
         {
           "id": 3,
           "name": "Henrique",
           "document": "63702853804",
-          "birthDate": "08/08/2000",
+          "birthDate": "2000-01-14T03:00:00.000Z",
           "genrer": "Masculino",
           "cellphone": "97284353454"
+        },
+        {
+          "name": "dadawdadadad",
+          "document": "511.891.158-32",
+          "birthDate": "2022-06-01T03:00:00.000Z",
+          "cellphone": "dawdad",
+          "genrer": "Masculino",
+          "id": 7
         }
       ]
     },
     {
       "id": 2,
-      "idGroup": "G2",
       "place": "Jericoacoara (Fortaleza)",
       "imageUrl": "group-2.jpg",
       "guide": {
@@ -161,34 +175,25 @@
       },
       "turists": [
         {
-          "id": 4,
-          "document": "73702853804",
-          "name": "Gustavo",
-          "birthDate": "20/05/2000",
+          "id": 2,
+          "document": "53702853804",
+          "name": "Davi",
+          "birthDate": "2000-04-14T03:00:00.000Z",
           "genrer": "Masculino",
-          "cellphone": "902784023"
+          "cellphone": "9753423235"
         },
         {
           "id": 5,
           "document": "83702853804",
           "name": "Christian",
-          "birthDate": "14/05/2000",
+          "birthDate": "2000-05-13T03:00:00.000Z",
           "genrer": "Masculino",
           "cellphone": "972544054"
-        },
-        {
-          "id": 6,
-          "document": "43702853434",
-          "name": "XavierGabriel",
-          "birthDate": "14/02/2002",
-          "genrer": "Masculino",
-          "cellphone": "972884011"
         }
       ]
     },
     {
       "id": 3,
-      "idGroup": "G3",
       "place": "Los Angeles (California)",
       "imageUrl": "group-3.jpg",
       "guide": {
@@ -198,36 +203,10 @@
         "cellphone": "902784023",
         "city": "Porto Alegre"
       },
-      "turists": [
-        {
-          "id": 4,
-          "document": "73702853804",
-          "name": "Gustavo",
-          "birthDate": "20/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "902784023"
-        },
-        {
-          "id": 5,
-          "document": "83702853804",
-          "name": "Christian",
-          "birthDate": "14/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "972544054"
-        },
-        {
-          "id": 6,
-          "document": "43702853434",
-          "name": "XavierGabriel",
-          "birthDate": "14/02/2002",
-          "genrer": "Masculino",
-          "cellphone": "972884011"
-        }
-      ]
+      "turists": []
     },
     {
       "id": 4,
-      "idGroup": "G4",
       "place": "Bora Bora (Polinésia Francesa)",
       "imageUrl": "group-4.jpg",
       "guide": {
@@ -237,36 +216,10 @@
         "cellphone": "972544054",
         "city": "Salvador"
       },
-      "turists": [
-        {
-          "id": 4,
-          "document": "73702853804",
-          "name": "Gustavo",
-          "birthDate": "20/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "902784023"
-        },
-        {
-          "id": 5,
-          "document": "83702853804",
-          "name": "Christian",
-          "birthDate": "14/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "972544054"
-        },
-        {
-          "id": 6,
-          "document": "43702853434",
-          "name": "XavierGabriel",
-          "birthDate": "14/02/2002",
-          "genrer": "Masculino",
-          "cellphone": "972884011"
-        }
-      ]
+      "turists": []
     },
     {
       "id": 5,
-      "idGroup": "G5",
       "place": "Maui (Havaí)",
       "imageUrl": "group-5.jpg",
       "guide": {
@@ -276,36 +229,10 @@
         "cellphone": "972544054",
         "city": "Salvador"
       },
-      "turists": [
-        {
-          "id": 4,
-          "document": "73702853804",
-          "name": "Gustavo",
-          "birthDate": "20/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "902784023"
-        },
-        {
-          "id": 5,
-          "document": "83702853804",
-          "name": "Christian",
-          "birthDate": "14/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "972544054"
-        },
-        {
-          "id": 6,
-          "document": "43702853434",
-          "name": "XavierGabriel",
-          "birthDate": "14/02/2002",
-          "genrer": "Masculino",
-          "cellphone": "972884011"
-        }
-      ]
+      "turists": []
     },
     {
       "id": 6,
-      "idGroup": "G6",
       "place": "Barcelona (Espanha)",
       "imageUrl": "group-6.jpg",
       "guide": {
@@ -315,36 +242,10 @@
         "cellphone": "972544054",
         "city": "Salvador"
       },
-      "turists": [
-        {
-          "id": 4,
-          "document": "73702853804",
-          "name": "Gustavo",
-          "birthDate": "20/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "902784023"
-        },
-        {
-          "id": 5,
-          "document": "83702853804",
-          "name": "Christian",
-          "birthDate": "14/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "972544054"
-        },
-        {
-          "id": 6,
-          "document": "43702853434",
-          "name": "XavierGabriel",
-          "birthDate": "14/02/2002",
-          "genrer": "Masculino",
-          "cellphone": "972884011"
-        }
-      ]
+      "turists": []
     },
     {
       "id": 7,
-      "idGroup": "G7",
       "place": "Campos do Jordão",
       "imageUrl": "campos.jpg",
       "guide": {
@@ -354,48 +255,7 @@
         "cellphone": "957583654",
         "city": "São Paulo"
       },
-      "turists": [
-        {
-          "id": 4,
-          "document": "73702853804",
-          "name": "Gustavo",
-          "birthDate": "20/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "902784023"
-        },
-        {
-          "id": 5,
-          "document": "83702853804",
-          "name": "Christian",
-          "birthDate": "14/05/2000",
-          "genrer": "Masculino",
-          "cellphone": "972544054"
-        },
-        {
-          "id": 6,
-          "document": "43702853434",
-          "name": "XavierGabriel",
-          "birthDate": "14/02/2002",
-          "genrer": "Masculino",
-          "cellphone": "972884011"
-        },
-        {
-          "id": 2,
-          "document": "53702853804",
-          "name": "Davi",
-          "birthDate": "2000-04-14T03:00:00.000Z",
-          "genrer": "Masculino",
-          "cellphone": "9753423235"
-        },
-        {
-          "id": 3,
-          "name": "Henrique",
-          "document": "63702853804",
-          "birthDate": "2000-01-14T03:00:00.000Z",
-          "genrer": "Masculino",
-          "cellphone": "97284353454"
-        }
-      ]
+      "turists": []
     }
   ],
   "locals": [

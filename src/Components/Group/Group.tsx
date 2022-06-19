@@ -13,6 +13,12 @@ import GetGroupDto from '../../Services/Group/dto/GetGroupDto';
 import PostGroupDto from '../../Services/Group/dto/PostGroupDto';
 import { InputText } from 'primereact/inputtext';
 import GroupService from '../../Services/Group/GroupService';
+import GuideService from '../../Services/Guide/GuideService';
+import GetGuideDto from '../../Services/Guide/dto/GetGuideDto';
+import { Params as ParamsGuide } from '../Guide/Guide';
+import { Params as ParamsTurist } from '../Turist/Turist';
+import TuristService from '../../Services/Turist/TuristService';
+import GetTuristDto from '../../Services/Turist/dto/GetTuristDto';
 
 interface Props {
 
@@ -27,6 +33,8 @@ export interface Params {
 const Group: FunctionComponent<Props> = (props) => {
 
   const [groups, setGroups] = useState<GetGroupDto[]>([]);
+  const [guides, setGuides] = useState<GetGuideDto[]>([]);
+  const [turists, setTurists] = useState<GetTuristDto[]>([]);
   const [group, setGroup] = useState({} as GetGroupDto);
   const [openMapDialog, setOpenMapDialog] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -35,6 +43,8 @@ const Group: FunctionComponent<Props> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useContext(ThemeContext).toast;
   const groupService = new GroupService(localStorage.getItem('token'));
+  const guideService = new GuideService(localStorage.getItem('token'));
+  const turistService = new TuristService(localStorage.getItem('token'));
   const inputRef = useRef<any>(null);
 
   const [filterParams, setFilterParams] = useState<Params>({
@@ -45,7 +55,37 @@ const Group: FunctionComponent<Props> = (props) => {
 
   useEffect(() => {
     getGroups();
+    getGuides();
+    getTurists();
   }, []);
+
+  const getGuides = async () => {
+    setIsLoading(true);
+    try {
+      const guides = await guideService.getGuides({} as ParamsGuide);
+      setGuides([...guides]);
+    }
+    catch (err: any) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
+
+  const getTurists = async () => {
+    setIsLoading(true);
+    try {
+      const turists = await turistService.getTurists({} as ParamsTurist);
+      setTurists([...turists]);
+    }
+    catch (err: any) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
 
   const getGroups = async () => {
     setIsLoading(true);
@@ -289,6 +329,8 @@ const Group: FunctionComponent<Props> = (props) => {
 
       <GroupForm
         group={group}
+        guides={guides}
+        turists={turists}
         openDetail={openDetail}
         loading={isLoading}
         createMode={createModa}
