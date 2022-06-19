@@ -11,6 +11,13 @@ import Groupservice from '../../Services/Group/GroupService';
 import { Params } from '../Group/Group';
 import GetGroupDto from '../../Services/Group/dto/GetGroupDto';
 import { MAX_GROUP_LENGHT } from '../../Env/env';
+import GroupForm from '../Group/Detail/Detail';
+import GetGuideDto from '../../Services/Guide/dto/GetGuideDto';
+import GetTuristDto from '../../Services/Turist/dto/GetTuristDto';
+import GuideService from '../../Services/Guide/GuideService';
+import TuristService from '../../Services/Turist/TuristService';
+import { Params as ParamsGuide } from '../Guide/Guide';
+import { Params as ParamsTurist } from '../Turist/Turist';
 
 interface Props {
 }
@@ -18,14 +25,19 @@ interface Props {
 const Home: FunctionComponent<Props> = (props) => {
 
   const [groups, setGroups] = useState<GetGroupDto[]>([]);
+  const [group, setGroup] = useState({} as GetGroupDto);
+  const [guides, setGuides] = useState<GetGuideDto[]>([]);
+  const [turists, setTurists] = useState<GetTuristDto[]>([]);
   const [pneultGroup, setPneultGroup] = useState({} as GetGroupDto);
   const [lastGroup, setLastGroup] = useState({} as GetGroupDto);
-  const [touristsLength, setTouristsLength] = useState(0);
   const [images, setImages] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [openDetail, setOpenDetail] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const toast = useContext(ThemeContext).toast;
   const groupService = new Groupservice(localStorage.getItem('token'));
+  const guideService = new GuideService(localStorage.getItem('token'));
+  const turistService = new TuristService(localStorage.getItem('token'));
 
   useEffect(() => {
     setImages([...imageData]);
@@ -33,6 +45,8 @@ const Home: FunctionComponent<Props> = (props) => {
 
   useEffect(() => {
     getGroups();
+    getGuides();
+    getTurists();
   }, []);
 
   const getGroups = async () => {
@@ -49,6 +63,43 @@ const Home: FunctionComponent<Props> = (props) => {
     finally {
       setIsLoading(false);
     }
+  }
+
+  const getGuides = async () => {
+    setIsLoading(true);
+    try {
+      const guides = await guideService.getGuides({} as ParamsGuide);
+      setGuides([...guides]);
+    }
+    catch (err: any) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
+
+  const getTurists = async () => {
+    setIsLoading(true);
+    try {
+      const turists = await turistService.getTurists({} as ParamsTurist);
+      setTurists([...turists]);
+    }
+    catch (err: any) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleAssoctiation = async () => {
+
+  }
+
+  const handleOpenDetail = (group: GetGroupDto) => {
+    setGroup({ ...group });
+    setOpenDetail(true);
   }
 
   const responsiveOptions = [
@@ -80,7 +131,7 @@ const Home: FunctionComponent<Props> = (props) => {
   }
 
   const getGroupNumberComplete = (turistLength: number) => {
-    
+
     if (turistLength) {
 
       return turistLength >= MAX_GROUP_LENGHT
@@ -156,12 +207,14 @@ const Home: FunctionComponent<Props> = (props) => {
 
           {groups.slice(0, groups.length - 2).map((item: GetGroupDto, i: number) => <>
             <GroupContent
+              group={item}
               country={item.place}
               guideName={item.guide.name}
               groupInformation={`${getGroupNumberComplete(item.turists?.length)}/10 (${getGroupLabelComplete(item.turists?.length)})`}
               groupNumber={i + 1}
               imageUrl={item.imageUrl}
               alt={`Imagem-Grupo${i + 1}`}
+              onOpenDetail={handleOpenDetail}
             />
 
             <hr className='hr-spacing'></hr>
@@ -187,6 +240,7 @@ const Home: FunctionComponent<Props> = (props) => {
                   label='Detalhes'
                   icon="pi pi-eye"
                   className='p-button-sm p-button-primary'
+                  onClick={() => handleOpenDetail(pneultGroup)}
                 />
               </div>
             </div>
@@ -209,6 +263,7 @@ const Home: FunctionComponent<Props> = (props) => {
                   label='Detalhes'
                   icon="pi pi-eye"
                   className='p-button-sm p-button-primary'
+                  onClick={() => handleOpenDetail(lastGroup)}
                 />
               </div>
             </div>
@@ -249,9 +304,18 @@ const Home: FunctionComponent<Props> = (props) => {
 
       </div>
 
-      {/* <GroupForm
+      <GroupForm
+        group={group}
+        guides={guides}
+        turists={turists}
+        isHome
+        openDetail={openDetail}
+        loading={isLoading}
+        onCreate={handleAssoctiation}
+        onUpdate={handleAssoctiation}
+        onClose={() => setOpenDetail(false)}
+      />
 
-      /> */}
     </div >
   );
 };

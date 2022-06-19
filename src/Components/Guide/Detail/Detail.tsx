@@ -111,6 +111,7 @@ const GuideForm: FunctionComponent<Props> = props => {
                   name="city"
                   label="Cidade"
                   component={FinalInputText}
+                  required
                 />
               </div>
             </div>

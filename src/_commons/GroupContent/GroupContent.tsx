@@ -1,7 +1,9 @@
 import { Button } from 'primereact/button';
 import { FunctionComponent } from 'react';
+import GetGroupDto from '../../Services/Group/dto/GetGroupDto';
 
 interface Props {
+  group: GetGroupDto,
   country: string,
   guideName: string,
   groupInformation: string,
@@ -9,9 +11,14 @@ interface Props {
   imageUrl: string,
   alt: string
   isOnePerComponent?: boolean;
+  onOpenDetail: (group: GetGroupDto) => void;
 }
 
 const GroupContent: FunctionComponent<Props> = (props) => {
+
+  const handleOpenDetail = () => {
+    props.onOpenDetail(props.group);
+  }
 
   return (
     <div>
@@ -34,6 +41,7 @@ const GroupContent: FunctionComponent<Props> = (props) => {
           label='Detalhes'
           icon="pi pi-eye"
           className='p-button-sm p-button-primary'
+          onClick={handleOpenDetail}
         />
       </div>
     </div>

@@ -10,13 +10,15 @@ import FinalDropdown from '../../../_commons/FinalForm/DropDown';
 import GetGuideDto from '../../../Services/Guide/dto/GetGuideDto';
 import FinalListbox from '../../../_commons/FinalForm/ListBox';
 import GetTuristDto from '../../../Services/Turist/dto/GetTuristDto';
+import { MAX_GROUP_LENGHT } from '../../../Env/env';
 
 interface Props {
   group: GetGroupDto;
   guides: GetGuideDto[];
   turists: GetTuristDto[];
   openDetail: boolean;
-  createMode: boolean;
+  createMode?: boolean;
+  isHome?: boolean;
   loading?: boolean;
   onCreate: (group: GetGroupDto) => void;
   onUpdate: (group: GetGroupDto) => void;
@@ -62,7 +64,7 @@ const GroupForm: FunctionComponent<Props> = props => {
         onClick={onClose}
       />
       <Button
-        label="Salvar"
+        label={props.isHome ? "Participar" : "Salvar"}
         className="lg:flex-grow-0 flex-grow-1 p-button-sm p-button-primary ml-1"
         onClick={() => handleSubmit(values)}
         disabled={!valid || pristine}
@@ -80,7 +82,7 @@ const GroupForm: FunctionComponent<Props> = props => {
         render={({
           ...renderProps
         }) => <Dialog
-          header={`${createMode ? "Adicionar" : "Editar"} Grupo`}
+          header={`${props.isHome ? 'Detalhes' : createMode ? "Adicionar" : "Editar"} Grupo`}
           className="w-6"
           visible={openDetail}
           onHide={onClose}
@@ -105,6 +107,7 @@ const GroupForm: FunctionComponent<Props> = props => {
                   options={guides.map((item: GetGuideDto) => Object.assign({}, { label: item.name, value: item }))}
                   component={FinalDropdown}
                   required
+                  disabled={props.isHome}
                 />
               </div>
               <div className={`field col-12 ${!createMode ? "lg:col-5" : "lg:col-6"}`}>
@@ -113,6 +116,7 @@ const GroupForm: FunctionComponent<Props> = props => {
                   label="Lugar"
                   component={FinalInputText}
                   required
+                  readOnly={props.isHome}
                 />
               </div>
               <div className="field col-12 lg:col-12">
@@ -122,6 +126,7 @@ const GroupForm: FunctionComponent<Props> = props => {
                   options={turists.map((item: GetTuristDto) => Object.assign({}, { label: item.name, value: item }))}
                   component={FinalListbox}
                   required
+                  disabled={props.isHome || group.turists?.length >= MAX_GROUP_LENGHT}
                 />
               </div>
             </div>
@@ -133,3 +138,7 @@ const GroupForm: FunctionComponent<Props> = props => {
 }
 
 export default GroupForm;
+
+GroupForm.defaultProps = {
+  isHome: false,
+}
