@@ -1,5 +1,7 @@
 import { createBrazilianCalendar, IContextProps, ThemeContext } from './Misc/utils';
 import { Toast } from 'primereact/toast';
+import { Provider } from 'react-redux';
+import { store } from './reducers/store';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import "primereact/resources/themes/bootstrap4-light-blue/theme.css";
@@ -28,12 +30,13 @@ function App() {
 
   return (
     <div>
-      <ThemeContext.Provider value={contextItems}>
-        <Toast ref={contextItems.toast} />
-        <RouteComponent />
-      </ThemeContext.Provider>
-
-    </div>
+      <Provider store={store}>
+        <ThemeContext.Provider value={contextItems}>
+          <Toast ref={contextItems.toast} />
+          <RouteComponent />
+        </ThemeContext.Provider>
+      </Provider>
+    </div >
   );
 }
 

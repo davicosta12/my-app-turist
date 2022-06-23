@@ -6,28 +6,23 @@ import { Galleria } from 'primereact/galleria';
 
 import onBoardHome from '../../assets/home-logo.jpg';
 import onSerchHome from '../../assets/search.jpg';
-import { ThemeContext, toastError } from '../../Misc/utils';
+import { ThemeContext, toastError, toastSuccess } from '../../Misc/utils';
 import Groupservice from '../../Services/Group/GroupService';
 import { Params } from '../Group/Group';
 import GetGroupDto from '../../Services/Group/dto/GetGroupDto';
 import { MAX_GROUP_LENGHT } from '../../Env/env';
 import GroupForm from '../Group/Detail/Detail';
-import GetGuideDto from '../../Services/Guide/dto/GetGuideDto';
+import { RootState, useAppSelector } from '../../reducers/store';
 import GetTuristDto from '../../Services/Turist/dto/GetTuristDto';
-import GuideService from '../../Services/Guide/GuideService';
-import TuristService from '../../Services/Turist/TuristService';
-import { Params as ParamsGuide } from '../Guide/Guide';
-import { Params as ParamsTurist } from '../Turist/Turist';
+import { useDispatch } from 'react-redux';
+import { setGroups } from '../../reducers/params/paramsSlice';
 
 interface Props {
 }
 
 const Home: FunctionComponent<Props> = (props) => {
 
-  const [groups, setGroups] = useState<GetGroupDto[]>([]);
   const [group, setGroup] = useState({} as GetGroupDto);
-  const [guides, setGuides] = useState<GetGuideDto[]>([]);
-  const [turists, setTurists] = useState<GetTuristDto[]>([]);
   const [pneultGroup, setPneultGroup] = useState({} as GetGroupDto);
   const [lastGroup, setLastGroup] = useState({} as GetGroupDto);
   const [images, setImages] = useState<any[]>([]);
@@ -35,9 +30,11 @@ const Home: FunctionComponent<Props> = (props) => {
   const [openDetail, setOpenDetail] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const toast = useContext(ThemeContext).toast;
+  const dispatch = useDispatch();
+
+  const groups = useAppSelector((state: RootState) => state.params.groups);
+
   const groupService = new Groupservice(localStorage.getItem('token'));
-  const guideService = new GuideService(localStorage.getItem('token'));
-  const turistService = new TuristService(localStorage.getItem('token'));
 
   useEffect(() => {
     setImages([...imageData]);
@@ -45,15 +42,13 @@ const Home: FunctionComponent<Props> = (props) => {
 
   useEffect(() => {
     getGroups();
-    getGuides();
-    getTurists();
   }, []);
 
   const getGroups = async () => {
     setIsLoading(true);
     try {
       const groups = await groupService.getGroups({} as Params);
-      setGroups([...groups]);
+      dispatch(setGroups([...groups]));
       setPneultGroup({ ...groups[groups.length - 2] });
       setLastGroup({ ...groups[groups.length - 1] });
     }
@@ -65,36 +60,20 @@ const Home: FunctionComponent<Props> = (props) => {
     }
   }
 
-  const getGuides = async () => {
+  const handleAssoctiation = async (values: GetTuristDto[], groupId: number) => {
     setIsLoading(true);
     try {
-      const guides = await guideService.getGuides({} as ParamsGuide);
-      setGuides([...guides]);
+      await groupService.patchGroup({ turists: [...values] }, groupId);
+      await getGroups();
+      setOpenDetail(false);
+      toast?.current?.show(toastSuccess('Usuário anexado com sucesso'));
     }
-    catch (err: any) {
+    catch (err) {
       toast?.current?.show(toastError(err));
     }
     finally {
       setIsLoading(false);
     }
-  }
-
-  const getTurists = async () => {
-    setIsLoading(true);
-    try {
-      const turists = await turistService.getTurists({} as ParamsTurist);
-      setTurists([...turists]);
-    }
-    catch (err: any) {
-      toast?.current?.show(toastError(err));
-    }
-    finally {
-      setIsLoading(false);
-    }
-  }
-
-  const handleAssoctiation = async () => {
-
   }
 
   const handleOpenDetail = (group: GetGroupDto) => {
@@ -306,13 +285,10 @@ const Home: FunctionComponent<Props> = (props) => {
 
       <GroupForm
         group={group}
-        guides={guides}
-        turists={turists}
         isHome
         openDetail={openDetail}
         loading={isLoading}
-        onCreate={handleAssoctiation}
-        onUpdate={handleAssoctiation}
+        onAssociate={handleAssoctiation}
         onClose={() => setOpenDetail(false)}
       />
 

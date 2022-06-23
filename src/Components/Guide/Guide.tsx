@@ -12,6 +12,9 @@ import { ThemeContext, toastError, toastSuccess } from '../../Misc/utils';
 import GuideService from '../../Services/Guide/GuideService';
 import GetGuideDto from '../../Services/Guide/dto/GetGuideDto';
 import { InputText } from 'primereact/inputtext';
+import { useDispatch } from 'react-redux';
+import { setGuides } from '../../reducers/params/paramsSlice';
+import { RootState, useAppSelector } from '../../reducers/store';
 
 
 interface Props {
@@ -25,7 +28,6 @@ export interface Params {
 
 const Guide: FunctionComponent<Props> = (props) => {
 
-  const [guides, setGuides] = useState<GetGuideDto[]>([]);
   const [guide, setGuide] = useState({} as GetGuideDto);
   const [openMapDialog, setOpenMapDialog] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -35,6 +37,9 @@ const Guide: FunctionComponent<Props> = (props) => {
   const toast = useContext(ThemeContext).toast;
   const guideService = new GuideService(localStorage.getItem('token'));
   const inputRef = useRef<any>(null);
+  const dispatch = useDispatch();
+
+  const guides = useAppSelector((state: RootState) => state.params.guides);
 
   const [filterParams, setFilterParams] = useState<Params>({
     id: '',
@@ -50,7 +55,7 @@ const Guide: FunctionComponent<Props> = (props) => {
     setIsLoading(true);
     try {
       const guides = await guideService.getGuides(filterParams);
-      setGuides([...guides]);
+      dispatch(setGuides([...guides]));
     }
     catch (err: any) {
       toast?.current?.show(toastError(err));

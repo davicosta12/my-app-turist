@@ -4,6 +4,7 @@ import ContentWrapper from './Components/ContentWrapper/ContentWrapper';
 import Group from './Components/Group/Group';
 import Guide from './Components/Guide/Guide';
 import Home from './Components/Home/Home';
+import Locations from './Components/Locations/Locations';
 import Login from './Components/Login/Login';
 import Turist from './Components/Turist/Turist';
 
@@ -44,6 +45,11 @@ const RouteComponent: FunctionComponent<Props> = (props) => {
         <Route path="/group" element={
           <PrivateRoute redirectTo='/'>
             <Group />
+          </PrivateRoute>}>
+        </Route>
+        <Route path="/locations" element={
+          <PrivateRoute redirectTo='/'>
+            <Locations />
           </PrivateRoute>}>
         </Route>
         <Route path="/" element={<Login />}></Route>

@@ -7,6 +7,7 @@ import FinalInputText from '../../_commons/FinalForm/InputText';
 import onBoardImage from '../../assets/mar-logo.jpg';
 import './Login.scss';
 import AuthRequestDto from '../../Services/Auth/dto/AuthRequestDto';
+import AuthHelper from '../../helper/AuthHelper';
 
 interface Props {
 }
@@ -25,12 +26,11 @@ const Login: FunctionComponent<Props> = (props) => {
     }
   }, [isLoading, navigate]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      localStorage.setItem("token", "token");
-      setIsLoading(false);
-    }, 2000);
+    localStorage.setItem("token", "token");
+    await AuthHelper.authenticate();
+    setIsLoading(false);
   }
 
   return (

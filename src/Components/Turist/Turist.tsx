@@ -16,6 +16,9 @@ import PutTuristDto from '../../Services/Turist/dto/PutTuristDto';
 import moment from 'moment';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
+import { useDispatch } from 'react-redux';
+import { RootState, useAppSelector } from '../../reducers/store';
+import { setTurists } from '../../reducers/params/paramsSlice';
 
 interface Props {
 }
@@ -28,7 +31,6 @@ export interface Params {
 
 const Turist: FunctionComponent<Props> = (props) => {
 
-  const [turists, setTurists] = useState<GetTuristDto[]>([]);
   const [turist, setTurist] = useState({} as GetTuristDto);
   const [openMapDialog, setOpenMapDialog] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -38,6 +40,9 @@ const Turist: FunctionComponent<Props> = (props) => {
   const toast = useContext(ThemeContext).toast;
   const turistService = new TuristService(localStorage.getItem('token'));
   const inputRef = useRef<any>(null);
+  const dispatch = useDispatch();
+
+  const turists = useAppSelector((state: RootState) => state.params.turists);
 
   const [filterParams, setFilterParams] = useState<Params>({
     id: '',
@@ -53,7 +58,7 @@ const Turist: FunctionComponent<Props> = (props) => {
     setIsLoading(true);
     try {
       const turists = await turistService.getTurists(filterParams);
-      setTurists([...turists]);
+      dispatch(setTurists([...turists]));
     }
     catch (err: any) {
       toast?.current?.show(toastError(err));

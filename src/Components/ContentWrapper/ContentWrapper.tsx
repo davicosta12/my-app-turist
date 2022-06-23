@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import { Menubar } from 'primereact/menubar';
@@ -6,6 +6,8 @@ import { Menu } from 'primereact/menu';
 import { Button } from 'primereact/button';
 import { Sidebar } from 'primereact/sidebar';
 import './ContentWrapper.scss';
+import { RootState, useAppSelector } from '../../reducers/store';
+import AuthHelper from '../../helper/AuthHelper';
 
 interface Props {
 }
@@ -15,13 +17,25 @@ const ContentWrapper: React.FunctionComponent<Props> = (props) => {
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
 
+  const groups = useAppSelector((state: RootState) => state.params.groups);
+  const guides = useAppSelector((state: RootState) => state.params.guides);
+  const turists = useAppSelector((state: RootState) => state.params.turists);
+
+  useEffect(() => {
+    if (!groups?.length || !guides?.length || !turists?.length) {
+      AuthHelper.restoreAuthFromCache();
+    }
+  }, []);
+
   const itemsSidebar = [
     {
       items: [
         { label: 'Home', icon: 'fa-solid fa-house', command: () => { navigate("/home"); setVisible(false); } },
-        { label: 'Guia', icon: 'fa-solid fa-compass', command: () => { navigate("/guide"); setVisible(false); } },
-        { label: 'Turista', icon: 'fa-solid fa-suitcase-rolling', command: () => { navigate("/turist"); setVisible(false); } },
-        { label: 'Grupo', icon: 'fa-solid fa-people-group', command: () => { navigate("/group"); setVisible(false); } }
+        { label: 'Localizações', icon: 'fa-solid fa-compass', command: () => { navigate("/locations"); setVisible(false); } },
+        //   { label: 'Guia', icon: 'fa-solid fa-compass', command: () => { navigate("/guide"); setVisible(false); } },
+        //   { label: 'Turista', icon: 'fa-solid fa-suitcase-rolling', command: () => { navigate("/turist"); setVisible(false); } },
+        //   { label: 'Grupo', icon: 'fa-solid fa-people-group', command: () => { navigate("/group"); setVisible(false); } }
+        // 
       ]
     },
   ];

@@ -11,17 +11,17 @@ import GetGuideDto from '../../../Services/Guide/dto/GetGuideDto';
 import FinalListbox from '../../../_commons/FinalForm/ListBox';
 import GetTuristDto from '../../../Services/Turist/dto/GetTuristDto';
 import { MAX_GROUP_LENGHT } from '../../../Env/env';
+import { RootState, useAppSelector } from '../../../reducers/store';
 
 interface Props {
   group: GetGroupDto;
-  guides: GetGuideDto[];
-  turists: GetTuristDto[];
   openDetail: boolean;
   createMode?: boolean;
   isHome?: boolean;
   loading?: boolean;
-  onCreate: (group: GetGroupDto) => void;
-  onUpdate: (group: GetGroupDto) => void;
+  onCreate?: (group: GetGroupDto) => void;
+  onUpdate?: (group: GetGroupDto) => void;
+  onAssociate?: (values: GetTuristDto[], groupId: number) => void;
   onClose: () => void;
 }
 
@@ -35,9 +35,12 @@ const GroupForm: FunctionComponent<Props> = props => {
     loading,
     openDetail,
     group,
-    guides,
-    turists,
   } = props;
+
+  const activeUser = useAppSelector((state: RootState) => state.params.activeUser);
+  const groups = useAppSelector((state: RootState) => state.params.groups);
+  const guides = useAppSelector((state: RootState) => state.params.guides);
+  const turists = useAppSelector((state: RootState) => state.params.turists);
 
   const formRef = useRef(createForm({
     onSubmit: () => { },
@@ -51,9 +54,33 @@ const GroupForm: FunctionComponent<Props> = props => {
   }, [group, openDetail]);
 
   const handleSubmit = (values: GetGroupDto) => {
-    createMode
-      ? onCreate(values)
-      : onUpdate(values);
+    !props.isHome
+      ? (createMode
+        ? onCreate?.(values)
+        : onUpdate?.(values)
+      )
+      : props.onAssociate?.([...group.turists, { ...activeUser }], group.id);
+  }
+
+  const getValidators = (valid: boolean, pristine: boolean) => {
+
+    let turistFind = false;
+
+    if (props.isHome) {
+
+      for (let group of groups) {
+
+        const turist = group.turists.filter(t => t.id === activeUser.id)[0];
+
+        if (turist) {
+          turistFind = true;
+          break;
+        }
+      }
+
+    }
+
+    return !props.isHome ? !valid || pristine : turistFind
   }
 
   const renderFooter = (values: GetGroupDto, valid: boolean, pristine: boolean) => <div className="grid">
@@ -67,7 +94,7 @@ const GroupForm: FunctionComponent<Props> = props => {
         label={props.isHome ? "Participar" : "Salvar"}
         className="lg:flex-grow-0 flex-grow-1 p-button-sm p-button-primary ml-1"
         onClick={() => handleSubmit(values)}
-        disabled={!valid || pristine}
+        disabled={getValidators(valid, pristine)}
         loading={loading}
       />
     </div>
@@ -123,7 +150,7 @@ const GroupForm: FunctionComponent<Props> = props => {
                 <Field
                   name="turists"
                   label="Turistas"
-                  options={turists.map((item: GetTuristDto) => Object.assign({}, { label: item.name, value: item }))}
+                  options={group.turists?.map((item: GetTuristDto) => Object.assign({}, { label: item.name, value: item }))}
                   component={FinalListbox}
                   required
                   disabled={props.isHome || group.turists?.length >= MAX_GROUP_LENGHT}
