@@ -15,7 +15,7 @@ export default class TuristService extends HttpService {
     if (params.genrer) query += `genrer=${params.genrer}&`;
 
     return new Promise((resolve, reject) => {
-      this.getApi().get(`/turists?${query}`)
+      this.getApi().get(`/users?${query}`)
         .then((res: any) => resolve(res.data || []))
         .catch((err: AxiosResponse<any>) => reject(err))
     });
@@ -23,7 +23,7 @@ export default class TuristService extends HttpService {
 
   getToristById(id: number): Promise<GetTouristDto> {
     return new Promise((resolve, reject) => {
-      this.getApi().get(`/turists/${id}`)
+      this.getApi().get(`/users/${id}`)
         .then((res: any) => resolve(res.data))
         .catch((err: AxiosResponse<any>) => reject(err))
     });
@@ -31,7 +31,7 @@ export default class TuristService extends HttpService {
 
   createTurist(tourist: PostTouristDto): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.getApi().post(`/turists`, tourist)
+      this.getApi().post(`/users`, tourist)
         .then((res: any) => resolve(res.data))
         .catch((err: AxiosResponse<any>) => reject(err))
     });
@@ -39,7 +39,15 @@ export default class TuristService extends HttpService {
 
   updateTurist(tourist: PutTouristDto, id: number): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.getApi().put(`/turists/${id}`, tourist)
+      this.getApi().put(`/users/${id}`, tourist)
+        .then((res: any) => resolve(res.data))
+        .catch((err: AxiosResponse<any>) => reject(err))
+    });
+  }
+
+  patchTurist(value: any, id: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getApi().patch(`/users/${id}`, value)
         .then((res: any) => resolve(res.data))
         .catch((err: AxiosResponse<any>) => reject(err))
     });
@@ -47,7 +55,7 @@ export default class TuristService extends HttpService {
 
   deleteTurist(id: number): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.getApi().delete(`/turists/${id}`)
+      this.getApi().delete(`/users/${id}`)
         .then((res: any) => resolve(res.data))
         .catch((err: AxiosResponse<any>) => reject(err))
     });

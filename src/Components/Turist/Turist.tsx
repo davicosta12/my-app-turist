@@ -19,6 +19,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { useDispatch } from 'react-redux';
 import { RootState, useAppSelector } from '../../reducers/store';
 import { setTurists } from '../../reducers/params/paramsSlice';
+import UserService from '../../Services/User/UserService';
 
 interface Props {
 }
@@ -39,6 +40,7 @@ const Turist: FunctionComponent<Props> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useContext(ThemeContext).toast;
   const turistService = new TuristService(localStorage.getItem('token'));
+  const userService = new UserService(localStorage.getItem('token'));
   const inputRef = useRef<any>(null);
   const dispatch = useDispatch();
 
@@ -50,14 +52,11 @@ const Turist: FunctionComponent<Props> = (props) => {
     genrer: ''
   });
 
-  useEffect(() => {
-    getTurists();
-  }, []);
-
   const getTurists = async () => {
     setIsLoading(true);
     try {
-      const turists = await turistService.getTurists(filterParams);
+      const users = await turistService.getTurists(filterParams);
+      const turists = users.filter(user => user.tipo === "T" && !user.isAdmin);
       dispatch(setTurists([...turists]));
     }
     catch (err: any) {
@@ -71,7 +70,12 @@ const Turist: FunctionComponent<Props> = (props) => {
   const handleCreateTurist = async (values: PostTuristDto) => {
     setIsLoading(true);
     try {
-      await turistService.createTurist(values);
+      const payload = Object.assign({}, { ...values, tipo: "T", isAdmin: false });
+      const res = await userService.createUser(payload);
+      if (!res.access_token) {
+        throw new Error("Erro no cadastro do Turista");
+      }
+      await turistService.createTurist(payload);
       await getTurists();
       setOpenDetail(false);
       toast?.current?.show(toastSuccess('Turista adicionado com sucesso'));
@@ -162,13 +166,13 @@ const Turist: FunctionComponent<Props> = (props) => {
   const actionsBodyTemplate = (rowData: GetTuristDto) => {
     return (
       <div className="lg:text-right pr-1">
-        <Button
+        {/* <Button
           icon="fa-solid fa-location-dot"
           className='p-button-secondary p-button-xs'
           tooltip="Posição"
           tooltipOptions={{ position: 'top' }}
           onClick={() => handleOpenMap(rowData)}
-        />
+        /> */}
         <Button
           icon="fas fa-pen"
           className='p-button-outlined-gray p-button-xs ml-2'
@@ -192,11 +196,11 @@ const Turist: FunctionComponent<Props> = (props) => {
 
       <h2 className='title-styles'>Turista</h2>
 
-      <section>
+      {/* <section>
         <Card title="Posições dos Turistas">
           <MapComponent />
         </Card>
-      </section>
+      </section> */}
 
       <section className='board-section surface-0 mt-5'>
         <div className='p-4'>

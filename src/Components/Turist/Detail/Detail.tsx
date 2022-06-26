@@ -9,6 +9,7 @@ import FinalInputMask from '../../../_commons/FinalForm/InputMask';
 import GetTuristDto from '../../../Services/Turist/dto/GetTuristDto';
 import FinalDropdown from '../../../_commons/FinalForm/DropDown';
 import FinalCalendar from '../../../_commons/FinalForm/Calendar';
+import FinalPassWord from '../../../_commons/FinalForm/Password';
 
 interface Props {
   turist: GetTuristDto;
@@ -94,6 +95,15 @@ const TuristForm: FunctionComponent<Props> = props => {
               </div>
               <div className="field col-12 lg:col-6">
                 <Field
+                  name="password"
+                  label="Senha"
+                  component={FinalPassWord}
+                  toggleMask
+                  required
+                />
+              </div>
+              <div className="field col-12 lg:col-6">
+                <Field
                   name="document"
                   label="CPF"
                   mask="999.999.999-99"
@@ -101,27 +111,38 @@ const TuristForm: FunctionComponent<Props> = props => {
                   required
                 />
               </div>
-              <div className="field col-12 lg:col-4">
+              <div className="field col-12 lg:col-6">
+                <Field
+                  name="email"
+                  label="Email"
+                  component={FinalInputText}
+                  required
+                />
+              </div>
+              <div className="field col-12 lg:col-6">
+                <Field
+                  name="genrer"
+                  label="Gênero"
+                  options={[
+                    { label: "Masculino", value: "Masculino" },
+                    { label: "Feminino", value: "Feminino" }]}
+                  component={FinalDropdown}
+                  required
+                />
+              </div>
+              <div className="field col-12 lg:col-6">
+                <Field
+                  name="birthDate"
+                  label="Data de Aniversário"
+                  component={FinalCalendar}
+                  required
+                />
+              </div>
+              <div className="field col-12 lg:col-6">
                 <Field
                   name="cellphone"
                   label="Celular"
                   component={FinalInputText}
-                />
-              </div>
-              <div className="field col-12 lg:col-4">
-                <Field
-                  name="genrer"
-                  label="Gênero"
-                  options={[{ label: 'Masculino', value: 'Masculino' }, { label: 'Feminino', value: 'Feminino' }]}
-                  component={FinalDropdown}
-                />
-              </div>
-              <div className="field col-12 lg:col-4">
-                <Field
-                  name="birthDate"
-                  label="Data de Nascimento"
-                  component={FinalCalendar}
-                  required
                 />
               </div>
             </div>

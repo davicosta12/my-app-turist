@@ -17,26 +17,29 @@ const ContentWrapper: React.FunctionComponent<Props> = (props) => {
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
 
-  const groups = useAppSelector((state: RootState) => state.params.groups);
-  const guides = useAppSelector((state: RootState) => state.params.guides);
-  const turists = useAppSelector((state: RootState) => state.params.turists);
+  const activeUser = useAppSelector((state: RootState) => state.params.activeUser);
 
   useEffect(() => {
-    if (!groups?.length || !guides?.length || !turists?.length) {
+    if (!activeUser.id) {
       AuthHelper.restoreAuthFromCache();
     }
   }, []);
 
   const itemsSidebar = [
     {
-      items: [
+      items: activeUser.isAdmin ? [
         { label: 'Home', icon: 'fa-solid fa-house', command: () => { navigate("/home"); setVisible(false); } },
-        { label: 'Localizações', icon: 'fa-solid fa-compass', command: () => { navigate("/locations"); setVisible(false); } },
-        //   { label: 'Guia', icon: 'fa-solid fa-compass', command: () => { navigate("/guide"); setVisible(false); } },
-        //   { label: 'Turista', icon: 'fa-solid fa-suitcase-rolling', command: () => { navigate("/turist"); setVisible(false); } },
-        //   { label: 'Grupo', icon: 'fa-solid fa-people-group', command: () => { navigate("/group"); setVisible(false); } }
-        // 
-      ]
+        { label: 'Localizações', icon: 'fa-solid fa-location-dot', command: () => { navigate("/locations"); setVisible(false); } },
+        { label: 'Guia', icon: 'fa-solid fa-compass', command: () => { navigate("/guide"); setVisible(false); } },
+        { label: 'Turista', icon: 'fa-solid fa-suitcase-rolling', command: () => { navigate("/turist"); setVisible(false); } },
+        { label: 'Grupo', icon: 'fa-solid fa-people-group', command: () => { navigate("/group"); setVisible(false); } }
+
+      ] :
+        [
+          { label: 'Home', icon: 'fa-solid fa-house', command: () => { navigate("/home"); setVisible(false); } },
+          { label: 'Localizações', icon: 'fa-solid fa-location-dot', command: () => { navigate("/locations"); setVisible(false); } },
+          { label: 'Guia', icon: 'fa-solid fa-compass', command: () => { navigate("/guide"); setVisible(false); } }
+        ]
     },
   ];
 

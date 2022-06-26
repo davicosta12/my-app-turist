@@ -1,56 +1,39 @@
-import { FunctionComponent, useEffect, useRef } from 'react';
+import { createForm } from 'final-form';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
+import { FunctionComponent, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
-import { createForm } from 'final-form';
-import { GuideValidators } from './validators';
-import FinalInputText from '../../../_commons/FinalForm/InputText';
-import FinalInputMask from '../../../_commons/FinalForm/InputMask';
 import GetGuideDto from '../../../Services/Guide/dto/GetGuideDto';
-import FinalDropdown from '../../../_commons/FinalForm/DropDown';
+import UserModelDto from '../../../Services/User/dto/UserModelDto';
 import FinalCalendar from '../../../_commons/FinalForm/Calendar';
+import FinalDropdown from '../../../_commons/FinalForm/DropDown';
+import FinalInputMask from '../../../_commons/FinalForm/InputMask';
+import FinalInputText from '../../../_commons/FinalForm/InputText';
 import FinalPassWord from '../../../_commons/FinalForm/Password';
+import { RegistrationValidators } from './validators';
 
 interface Props {
-  guide: GetGuideDto;
   openDetail: boolean;
-  createMode: boolean;
   loading?: boolean;
-  onCreate: (guide: GetGuideDto) => void;
-  onUpdate: (guide: GetGuideDto) => void;
+  onCreate: (user: UserModelDto) => void;
   onClose: () => void;
 }
 
-const GuideForm: FunctionComponent<Props> = props => {
+const Registration: FunctionComponent<Props> = (props) => {
 
-  const {
-    onCreate,
-    onUpdate,
-    onClose,
-    createMode,
-    loading,
-    openDetail,
-    guide,
-  } = props;
+  const { onClose, onCreate, loading, openDetail } = props;
 
   const formRef = useRef(createForm({
     onSubmit: () => { },
-    validate: GuideValidators
+    validate: RegistrationValidators
   }));
 
-  useEffect(() => {
-    guide?.id
-      ? formRef.current.initialize({ ...guide } as GetGuideDto)
-      : formRef.current.reset({} as GetGuideDto);
-  }, [guide, openDetail]);
-
-  const handleSubmit = (values: GetGuideDto) => {
-    createMode
-      ? onCreate(values)
-      : onUpdate(values);
+  const handleSubmit = (values: UserModelDto) => {
+    onCreate(values)
   }
 
-  const renderFooter = (values: GetGuideDto, valid: boolean, pristine: boolean) => <div className="grid">
+
+  const renderFooter = (values: UserModelDto, valid: boolean) => <div className="grid">
     <div className="col-12 flex justify-content-end">
       <Button
         label="Fechar"
@@ -61,7 +44,7 @@ const GuideForm: FunctionComponent<Props> = props => {
         label="Salvar"
         className="lg:flex-grow-0 flex-grow-1 p-button-sm p-button-primary ml-1"
         onClick={() => handleSubmit(values)}
-        disabled={!valid || pristine}
+        disabled={!valid}
         loading={loading}
       />
     </div>
@@ -71,18 +54,18 @@ const GuideForm: FunctionComponent<Props> = props => {
     <>
       <Form
         form={formRef.current}
-        validate={GuideValidators}
+        validate={RegistrationValidators}
         onSubmit={() => { }}
         render={({
           ...renderProps
         }) => <Dialog
-          header={`${createMode ? "Adicionar" : "Editar"} Guia`}
+          header={`Cadastre-se aqui`}
           className="w-6"
           visible={openDetail}
           onHide={onClose}
           breakpoints={{ '960px': '75vw' }}
           maximizable
-          footer={() => renderFooter(renderProps.values, renderProps.valid, renderProps.pristine)}
+          footer={() => renderFooter(renderProps.values, renderProps.valid)}
         >
             <div className="formgrid grid">
               <div className="field col-12 lg:col-6">
@@ -99,6 +82,17 @@ const GuideForm: FunctionComponent<Props> = props => {
                   label="Senha"
                   component={FinalPassWord}
                   toggleMask
+                  required
+                />
+              </div>
+              <div className="field col-12 lg:col-6">
+                <Field
+                  name="tipo"
+                  label="Tipo do Usuário"
+                  options={[
+                    { label: "Guia", value: "G" },
+                    { label: "Turista", value: "T" }]}
+                  component={FinalDropdown}
                   required
                 />
               </div>
@@ -151,6 +145,6 @@ const GuideForm: FunctionComponent<Props> = props => {
       />
     </>
   );
-}
+};
 
-export default GuideForm;
+export default Registration;

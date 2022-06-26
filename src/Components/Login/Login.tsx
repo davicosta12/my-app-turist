@@ -1,6 +1,6 @@
 
 import { Button } from 'primereact/button';
-import { FunctionComponent, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useContext, useEffect, useRef, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { useNavigate } from 'react-router-dom';
 import FinalInputText from '../../_commons/FinalForm/InputText';
@@ -8,13 +8,23 @@ import onBoardImage from '../../assets/mar-logo.jpg';
 import './Login.scss';
 import AuthRequestDto from '../../Services/Auth/dto/AuthRequestDto';
 import AuthHelper from '../../helper/AuthHelper';
+import { ThemeContext, toastError, toastSuccess } from '../../Misc/utils';
+import Registration from './Registration/Registration';
+import UserModelDto from '../../Services/User/dto/UserModelDto';
+import UserService from '../../Services/User/UserService';
+import GuideService from '../../Services/Guide/GuideService';
+import PostGuideDto from '../../Services/Guide/dto/PostGuideDto';
 
 interface Props {
 }
 
 const Login: FunctionComponent<Props> = (props) => {
 
+  const [openDetail, setOpenDetail] = useState(false);
+  const [isLoadingRegister, setIsLoadingRegister] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const userService = new UserService(localStorage.getItem('token'));
+  const toast = useContext(ThemeContext).toast;
   const navigate = useNavigate();
 
   const { Form } = withTypes<AuthRequestDto>();
@@ -26,11 +36,45 @@ const Login: FunctionComponent<Props> = (props) => {
     }
   }, [isLoading, navigate]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (formValues: UserModelDto) => {
     setIsLoading(true);
-    localStorage.setItem("token", "token");
-    await AuthHelper.authenticate();
-    setIsLoading(false);
+    try {
+      await AuthHelper.authenticate(formValues.email, formValues.password);
+    }
+    catch (err: any) {
+      toast?.current.show(toastError(err));
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleRegister = async (formValues: UserModelDto) => {
+    setIsLoadingRegister(true);
+    try {
+      const payload = Object.assign({}, { ...formValues, isAdmin: false });
+      const res = await userService.createUser(payload);
+      if (!res.access_token) {
+        throw new Error("Erro no cadastro do Guia");
+      }
+
+      const guideService = new GuideService(res.access_token.toString());
+      await guideService.createGuide(formValues as PostGuideDto);
+
+      setOpenDetail(false);
+      toast?.current?.show(toastSuccess('Usuário adicionado com sucesso'));
+    }
+    catch (err) {
+      toast?.current?.show(toastError(err));
+    }
+    finally {
+      setIsLoadingRegister(false);
+    }
+  }
+
+  const handleOpenDetail = (e: any) => {
+    e.preventDefault();
+    setOpenDetail(true);
   }
 
   return (
@@ -49,8 +93,8 @@ const Login: FunctionComponent<Props> = (props) => {
                   </div>
                   <div className="field col-12">
                     <Field
-                      name="user"
-                      label="Usuário"
+                      name="email"
+                      label="Email"
                       component={FinalInputText}
                       className="inputfield w-full"
                       autoFocus
@@ -65,21 +109,21 @@ const Login: FunctionComponent<Props> = (props) => {
                       type="password"
                     />
                   </div>
-                  {/* <div className="flex field col-12 login-options">
-          <div>
-            <Checkbox className="checkbox-login" onChange={() => setRememberData(state => !state)} checked={rememberData} />
-            <p>Relembrar dados</p>
-          </div>
-
-          <a href='#'>Esqueceu a senha?</a>
-        </div> */}
                   <div className="flex field col-12 container-login-button mt-2">
                     <Button
                       label="Entrar"
                       className="p-button-primary flex-grow-1"
                       loading={isLoading}
-                      disabled={!formProps.values.user || !formProps.values.password}
-                      onClick={handleSubmit}
+                      disabled={!formProps.values.email || !formProps.values.password}
+                      onClick={() => handleSubmit(formProps.values as PostGuideDto)}
+                    />
+                  </div>
+                  <div className="flex field col-12 container-login-button mt-2">
+                    <Button
+                      label="Cadastrar"
+                      className="p-button-secondary flex-grow-1"
+                      loading={isLoading}
+                      onClick={handleOpenDetail}
                     />
                   </div>
                 </form>
@@ -91,6 +135,12 @@ const Login: FunctionComponent<Props> = (props) => {
       <div className='login-right'>
         <img alt='logo' src={onBoardImage} />
       </div>
+      <Registration
+        openDetail={openDetail}
+        onCreate={handleRegister}
+        loading={isLoadingRegister}
+        onClose={() => setOpenDetail(false)}
+      />
     </div>
   );
 };

@@ -6,6 +6,7 @@ import GroupService from "../Services/Group/GroupService";
 import GuideService from "../Services/Guide/GuideService";
 import TuristService from "../Services/Turist/TuristService";
 import { setGroups, setGuides, setTurists } from "../reducers/params/paramsSlice";
+import UserModelDto from "../Services/User/dto/UserModelDto";
 
 const GetGlobalParamsHelper = () => {
 
@@ -38,9 +39,9 @@ export default GetGlobalParamsHelper
 const dispatchAction = (res: any, index: number) => {
   const { dispatch } = store;
   switch (index) {
-    case 0: dispatch(setGuides(res)); break;
+    case 0: dispatch(setGuides(res.filter((user: UserModelDto) => user.tipo === "G" && !user.isAdmin))); break;
     case 1: dispatch(setGroups(res)); break;
-    case 2: dispatch(setTurists(res)); break;
+    case 2: dispatch(setTurists(res.filter((user: UserModelDto) => user.tipo === "T" && !user.isAdmin))); break;
     default:
   }
 }

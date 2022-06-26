@@ -40,7 +40,6 @@ const GroupForm: FunctionComponent<Props> = props => {
   const activeUser = useAppSelector((state: RootState) => state.params.activeUser);
   const groups = useAppSelector((state: RootState) => state.params.groups);
   const guides = useAppSelector((state: RootState) => state.params.guides);
-  const turists = useAppSelector((state: RootState) => state.params.turists);
 
   const formRef = useRef(createForm({
     onSubmit: () => { },
@@ -59,7 +58,19 @@ const GroupForm: FunctionComponent<Props> = props => {
         ? onCreate?.(values)
         : onUpdate?.(values)
       )
-      : props.onAssociate?.([...group.turists, { ...activeUser }], group.id);
+      : props.onAssociate?.([...group?.turists, {
+        id: activeUser.id,
+        password: activeUser.password,
+        birthDate: activeUser.birthDate,
+        cellphone: activeUser.cellphone,
+        document: activeUser.document,
+        email: activeUser.email,
+        genrer: activeUser.genrer,
+        idGrupo: group.id,
+        name: activeUser.name,
+        tipo: activeUser.tipo,
+        isAdmin: false
+      }], group.id);
   }
 
   const getValidators = (valid: boolean, pristine: boolean) => {
@@ -70,7 +81,7 @@ const GroupForm: FunctionComponent<Props> = props => {
 
       for (let group of groups) {
 
-        const turist = group.turists.filter(t => t.id === activeUser.id)[0];
+        const turist = group.turists?.filter(t => t.id === activeUser.id)[0];
 
         if (turist) {
           turistFind = true;
@@ -83,6 +94,15 @@ const GroupForm: FunctionComponent<Props> = props => {
     return !props.isHome ? !valid || pristine : turistFind
   }
 
+  const handleCreateOptions = () => {
+
+    const guideIds = groups.map(g => g.guide.id);
+
+    const newGuides = guides.filter(g => !guideIds.includes(g.id));
+
+    return newGuides.map((item: GetGuideDto) => Object.assign({}, { label: item.name, value: item }))
+  }
+
   const renderFooter = (values: GetGroupDto, valid: boolean, pristine: boolean) => <div className="grid">
     <div className="col-12 flex justify-content-end">
       <Button
@@ -90,13 +110,13 @@ const GroupForm: FunctionComponent<Props> = props => {
         className="lg:flex-grow-0 flex-grow-1 p-button-sm p-button-secondary"
         onClick={onClose}
       />
-      <Button
+      {(activeUser.tipo === "T" || !props.isHome) && <Button
         label={props.isHome ? "Participar" : "Salvar"}
         className="lg:flex-grow-0 flex-grow-1 p-button-sm p-button-primary ml-1"
         onClick={() => handleSubmit(values)}
         disabled={getValidators(valid, pristine)}
         loading={loading}
-      />
+      />}
     </div>
   </div>
 
@@ -110,7 +130,7 @@ const GroupForm: FunctionComponent<Props> = props => {
           ...renderProps
         }) => <Dialog
           header={`${props.isHome ? 'Detalhes' : createMode ? "Adicionar" : "Editar"} Grupo`}
-          className="w-6"
+          className="w-4"
           visible={openDetail}
           onHide={onClose}
           breakpoints={{ '960px': '75vw' }}
@@ -118,7 +138,7 @@ const GroupForm: FunctionComponent<Props> = props => {
           footer={() => renderFooter(renderProps.values, renderProps.valid, renderProps.pristine)}
         >
             <div className="formgrid grid">
-              {!createMode && <div className="field col-12 lg:col-3">
+              {!createMode && <div className="field col-12 ">
                 <Field
                   name="id"
                   label="Id Grupo"
@@ -127,17 +147,26 @@ const GroupForm: FunctionComponent<Props> = props => {
                   readOnly
                 />
               </div>}
-              <div className={`field col-12 ${!createMode ? "lg:col-4" : "lg:col-6"}`}>
+              <div className={`field col-12`}>
                 <Field
                   name="guide"
                   label="Guia"
-                  options={guides.map((item: GetGuideDto) => Object.assign({}, { label: item.name, value: item }))}
+                  options={(!createMode || props.isHome) ? guides.map((item: GetGuideDto) => Object.assign({}, { label: item.name, value: item })) : handleCreateOptions()}
                   component={FinalDropdown}
                   required
                   disabled={props.isHome}
                 />
               </div>
-              <div className={`field col-12 ${!createMode ? "lg:col-5" : "lg:col-6"}`}>
+              <div className={`field col-12`}>
+                <Field
+                  name="imageUrl"
+                  label="URL da Imagem"
+                  component={FinalInputText}
+                  required
+                  disabled={props.isHome}
+                />
+              </div>
+              <div className={`field col-12`}>
                 <Field
                   name="place"
                   label="Lugar"
@@ -146,7 +175,7 @@ const GroupForm: FunctionComponent<Props> = props => {
                   readOnly={props.isHome}
                 />
               </div>
-              <div className="field col-12 lg:col-12">
+              {props.isHome && <div className="field col-12">
                 <Field
                   name="turists"
                   label="Turistas"
@@ -155,7 +184,7 @@ const GroupForm: FunctionComponent<Props> = props => {
                   required
                   disabled={props.isHome || group.turists?.length >= MAX_GROUP_LENGHT}
                 />
-              </div>
+              </div>}
             </div>
           </Dialog>
         }

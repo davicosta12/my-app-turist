@@ -16,6 +16,9 @@ import { RootState, useAppSelector } from '../../reducers/store';
 import GetTuristDto from '../../Services/Turist/dto/GetTuristDto';
 import { useDispatch } from 'react-redux';
 import { setGroups } from '../../reducers/params/paramsSlice';
+import TuristService from '../../Services/Turist/TuristService';
+import GroupService from '../../Services/Group/GroupService';
+import GuideService from '../../Services/Guide/GuideService';
 
 interface Props {
 }
@@ -32,9 +35,13 @@ const Home: FunctionComponent<Props> = (props) => {
   const toast = useContext(ThemeContext).toast;
   const dispatch = useDispatch();
 
+  const turists = useAppSelector((state: RootState) => state.params.turists);
+  const guides = useAppSelector((state: RootState) => state.params.guides);
   const groups = useAppSelector((state: RootState) => state.params.groups);
+  const activeUser = useAppSelector((state: RootState) => state.params.activeUser);
 
-  const groupService = new Groupservice(localStorage.getItem('token'));
+  const groupService = new GroupService(localStorage.getItem('token'));
+  const turistService = new TuristService(localStorage.getItem('token'));
 
   useEffect(() => {
     setImages([...imageData]);
@@ -42,15 +49,41 @@ const Home: FunctionComponent<Props> = (props) => {
 
   useEffect(() => {
     getGroups();
-  }, []);
+  }, [activeUser, turists, guides]); // eslint-disable-line react-hooks/exhaustive-deps
+
 
   const getGroups = async () => {
     setIsLoading(true);
     try {
-      const groups = await groupService.getGroups({} as Params);
-      dispatch(setGroups([...groups]));
-      setPneultGroup({ ...groups[groups.length - 2] });
-      setLastGroup({ ...groups[groups.length - 1] });
+
+      let _groups = await groupService.getGroups({} as Params);
+      const userJsonServerTurist = turists.filter(t => t.id === activeUser.id)[0];
+      const userJsonServerGuide = guides.filter(t => t.id === activeUser.id)[0];
+
+      if (activeUser.tipo === "T" && userJsonServerTurist?.idGrupo) {
+        _groups = _groups.filter(g => g.id === userJsonServerTurist.idGrupo);
+      }
+
+      if (activeUser.tipo === "G") {
+        userJsonServerGuide?.idGrupo
+          ? _groups = _groups.filter(g => g.id === userJsonServerGuide.idGrupo)
+          : _groups = [];
+      }
+
+      dispatch(setGroups([..._groups]));
+
+      if (_groups.length) {
+        setPneultGroup({} as GetGroupDto);
+        setLastGroup({} as GetGroupDto);
+
+        if (_groups.length > 1) {
+          setPneultGroup({ ..._groups[_groups.length - 2] });
+          setLastGroup({ ..._groups[_groups.length - 1] });
+        } else {
+          setPneultGroup({ ..._groups[0] });
+        }
+      }
+
     }
     catch (err: any) {
       toast?.current?.show(toastError(err));
@@ -64,6 +97,9 @@ const Home: FunctionComponent<Props> = (props) => {
     setIsLoading(true);
     try {
       await groupService.patchGroup({ turists: [...values] }, groupId);
+      await turistService.patchTurist(Object.assign({}, {
+        idGrupo: group.id,
+      }), activeUser.id)
       await getGroups();
       setOpenDetail(false);
       toast?.current?.show(toastSuccess('Usuário anexado com sucesso'));
@@ -143,9 +179,12 @@ const Home: FunctionComponent<Props> = (props) => {
       }
     }
 
-    return _completeLabel
-      ? `Faltam ${_completeLabel} pessoas para completar o grupo`
-      : `Seja o primeiro a participar do grupo`;
+    return (_completeLabel && _completeLabel == 'dez')
+      ? 'As vagas para o grupo já estão preenchidas'
+      :
+      (_completeLabel ?
+        `Faltam ${_completeLabel} pessoas para completar o grupo`
+        : `Seja o primeiro a participar do grupo`);
   }
 
   return (
@@ -200,17 +239,17 @@ const Home: FunctionComponent<Props> = (props) => {
           </>)}
 
           <div className='w-auto lg:flex justify-content-between'>
-            <div className='w-12 lg:w-6'>
+            {pneultGroup.id && <div className='w-12 lg:w-6'>
               <div>
                 <img
                   src={require(`../../assets/${pneultGroup?.imageUrl || 'defaultImg.jpg'}`)}
-                  alt={`Imagem-Grupo${groups.length - 1}`}
+                  alt={`Imagem-Grupo${groups.length === 1 ? groups.length : groups.length - 1}`}
                   width='100%'
                   height='562.41px'
                 />
               </div>
               <div className='w-full lg:ml-4 lg:mt-3'>
-                <h2 className='title-styles'>{`Grupo ${groups.length - 1} - Viagem: ${pneultGroup.place}`}</h2>
+                <h2 className='title-styles'>{`Grupo ${groups.length === 1 ? groups.length : groups.length - 1} - Viagem: ${pneultGroup.place}`}</h2>
                 <p className='paragraph-styles'>{`Guia: ${pneultGroup.guide?.name}`}</p>
                 <p className='paragraph-styles'>{`Grupo: ${getGroupNumberComplete(pneultGroup.turists?.length)}/10 (${getGroupLabelComplete(pneultGroup.turists?.length)})`}</p>
               </div>
@@ -222,8 +261,9 @@ const Home: FunctionComponent<Props> = (props) => {
                   onClick={() => handleOpenDetail(pneultGroup)}
                 />
               </div>
-            </div>
-            <div className='w-12 lg:w-6 lg:ml-5 mt-3 lg:mt-0'>
+            </div>}
+
+            {lastGroup.id && <div className='w-12 lg:w-6 lg:ml-5 mt-3 lg:mt-0'>
               <div>
                 <img
                   src={require(`../../assets/${lastGroup?.imageUrl || 'defaultImg.jpg'}`)}
@@ -246,9 +286,11 @@ const Home: FunctionComponent<Props> = (props) => {
                 />
               </div>
             </div>
+            }
+            {!groups.length ? <h2 className='title-styles text-center my-8'>Não existem grupos ativos no sistema</h2> : null}
           </div>
 
-          <hr className='hr-spacing'></hr>
+          {groups.length ? <hr className='hr-spacing'></hr> : null}
 
           <div>
             <div className='w-auto lg:flex'>
@@ -271,13 +313,13 @@ const Home: FunctionComponent<Props> = (props) => {
                 <p className='paragraph-styles'>Estas viagens já estão com grupos fechados, porém fiquem espertos para não perderem esta oportunidade em sua próxima viagem!</p>
               </div>
             </div>
-            <div className='text-right mt-5'>
+            {/* <div className='text-right mt-5'>
               <Button
                 label='Localizações'
                 icon="fa-solid fa-location-dot"
                 className='p-button-sm p-button-primary'
               />
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -285,6 +327,7 @@ const Home: FunctionComponent<Props> = (props) => {
 
       <GroupForm
         group={group}
+        createMode={false}
         isHome
         openDetail={openDetail}
         loading={isLoading}

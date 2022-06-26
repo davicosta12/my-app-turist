@@ -1,9 +1,8 @@
-export default interface GetTuristDto {
+export default interface UserModelDto {
     id: number,
-    idGrupo: number,
     name: string,
-    password: string,
     email: string,
+    password: string,
     tipo: string,
     document: string,
     birthDate: string,

@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux';
 import { setGroups } from '../../reducers/params/paramsSlice';
 import { RootState, useAppSelector } from '../../reducers/store';
 import GetTuristDto from '../../Services/Turist/dto/GetTuristDto';
+import GuideService from '../../Services/Guide/GuideService';
 
 interface Props {
 
@@ -38,6 +39,7 @@ const Group: FunctionComponent<Props> = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useContext(ThemeContext).toast;
   const groupService = new GroupService(localStorage.getItem('token'));
+  const guideService = new GuideService(localStorage.getItem('token'));
   const inputRef = useRef<any>(null);
   const dispatch = useDispatch();
 
@@ -48,10 +50,6 @@ const Group: FunctionComponent<Props> = (props) => {
     guideName: '',
     place: ''
   });
-
-  useEffect(() => {
-    getGroups();
-  }, []);
 
   const getGroups = async () => {
     setIsLoading(true);
@@ -70,7 +68,12 @@ const Group: FunctionComponent<Props> = (props) => {
   const handleCreateGroup = async (values: PostGroupDto) => {
     setIsLoading(true);
     try {
-      await groupService.createGroup(values);
+      const payload = Object.assign({}, { ...values, idGrupo: groups.length + 1, turists: [] });
+      const patchGuide = Object.assign({}, { idGrupo: groups.length + 1 });
+
+      await groupService.createGroup(payload);
+      await guideService.patchGuide(patchGuide, values.guide.id);
+
       await getGroups();
       setOpenDetail(false);
       toast?.current?.show(toastSuccess('Grupo adicionado com sucesso'));
@@ -161,13 +164,13 @@ const Group: FunctionComponent<Props> = (props) => {
   const actionsBodyTemplate = (rowData: GetGroupDto) => {
     return (
       <div className="lg:text-right pr-1">
-        <Button
+        {/* <Button
           icon="fa-solid fa-location-dot"
           className='p-button-secondary p-button-xs'
           tooltip="Posição"
           tooltipOptions={{ position: 'top' }}
           onClick={() => handleOpenMap(rowData)}
-        />
+        /> */}
         <Button
           icon="fas fa-pen"
           className='p-button-outlined-gray p-button-xs ml-2'
@@ -190,11 +193,11 @@ const Group: FunctionComponent<Props> = (props) => {
     <div className='board-spacing'>
       <h2 className='title-styles'>Grupo</h2>
 
-      <section>
+      {/* <section>
         <Card title="Posições dos Grupos">
           <MapComponent />
         </Card>
-      </section>
+      </section> */}
 
       <section className='board-section surface-0 mt-5'>
         <div className='p-4'>

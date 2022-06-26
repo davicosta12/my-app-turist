@@ -1,5 +1,6 @@
+import UserModelDto from "../../User/dto/UserModelDto"
+
 export default interface AuthResponseDto {
-    user: any,
-    token: string,
-    validToken: string,
+    access_token: string,
+    dadoslogin: UserModelDto
 }
