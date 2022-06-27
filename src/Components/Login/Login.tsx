@@ -52,14 +52,14 @@ const Login: FunctionComponent<Props> = (props) => {
   const handleRegister = async (formValues: UserModelDto) => {
     setIsLoadingRegister(true);
     try {
-      const payload = Object.assign({}, { ...formValues, isAdmin: false });
+      const payload = Object.assign({}, { ...formValues, isAdmin: false, isActive: true });
       const res = await userService.createUser(payload);
       if (!res.access_token) {
         throw new Error("Erro no cadastro do Guia");
       }
 
       const guideService = new GuideService(res.access_token.toString());
-      await guideService.createGuide(formValues as PostGuideDto);
+      await guideService.createGuide({ ...formValues, isAdmin: false, isActive: true } as PostGuideDto);
 
       setOpenDetail(false);
       toast?.current?.show(toastSuccess('Usuário adicionado com sucesso'));
@@ -112,13 +112,13 @@ const Login: FunctionComponent<Props> = (props) => {
                   <div className="flex field col-12 container-login-button mt-2">
                     <Button
                       label="Entrar"
-                      className="p-button-primary flex-grow-1"
+                      className="p-button-primary  flex-grow-1"
                       loading={isLoading}
                       disabled={!formProps.values.email || !formProps.values.password}
                       onClick={() => handleSubmit(formProps.values as PostGuideDto)}
                     />
                   </div>
-                  <div className="flex field col-12 container-login-button mt-2">
+                  <div className="flex field col-12 container-register-button mt-2">
                     <Button
                       label="Cadastrar"
                       className="p-button-secondary flex-grow-1"

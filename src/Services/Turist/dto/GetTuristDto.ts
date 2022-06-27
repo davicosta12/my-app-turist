@@ -9,5 +9,6 @@ export default interface GetTuristDto {
     birthDate: string,
     genrer: string,
     cellphone: string,
-    isAdmin: boolean
+    isAdmin: boolean,
+    isActive: boolean
 }

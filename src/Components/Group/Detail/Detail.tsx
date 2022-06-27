@@ -69,7 +69,8 @@ const GroupForm: FunctionComponent<Props> = props => {
         idGrupo: group.id,
         name: activeUser.name,
         tipo: activeUser.tipo,
-        isAdmin: false
+        isAdmin: false,
+        isActive: false
       }], group.id);
   }
 
@@ -114,7 +115,7 @@ const GroupForm: FunctionComponent<Props> = props => {
         label={props.isHome ? "Participar" : "Salvar"}
         className="lg:flex-grow-0 flex-grow-1 p-button-sm p-button-primary ml-1"
         onClick={() => handleSubmit(values)}
-        disabled={getValidators(valid, pristine)}
+        disabled={getValidators(valid, pristine) || group.turists?.length === MAX_GROUP_LENGHT}
         loading={loading}
       />}
     </div>

@@ -2,9 +2,12 @@ import { FunctionComponent } from 'react';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import MapComponent from '../MapComponent/MapComponent';
+import GetLocationDto from '../../Services/Location/dto/GetLocationDto';
 
 
 interface Props {
+  location: GetLocationDto;
+  historicSpecific: any,
   header: string;
   openDialog: boolean;
   loading?: boolean;
@@ -25,7 +28,7 @@ const MapDialog: FunctionComponent<Props> = props => {
     <div className="col-12 flex justify-content-end">
       <Button
         label="Fechar"
-        className="lg:flex-grow-0 flex-grow-1 p-button-sm p-button-outlined-gray "
+        className="lg:flex-grow-0 flex-grow-1 p-button-sm p-button-secondary "
         onClick={onClose}
       />
     </div>
@@ -43,7 +46,10 @@ const MapDialog: FunctionComponent<Props> = props => {
         footer={renderFooter}
       >
         <div>
-          <MapComponent />
+          <MapComponent
+            location={props.location}
+            historicSpecific={props.historicSpecific}
+          />
         </div>
       </Dialog>
     </>

@@ -103,6 +103,8 @@ const Home: FunctionComponent<Props> = (props) => {
       await getGroups();
       setOpenDetail(false);
       toast?.current?.show(toastSuccess('Usuário anexado com sucesso'));
+
+      window.location?.reload();
     }
     catch (err) {
       toast?.current?.show(toastError(err));
@@ -110,6 +112,7 @@ const Home: FunctionComponent<Props> = (props) => {
     finally {
       setIsLoading(false);
     }
+
   }
 
   const handleOpenDetail = (group: GetGroupDto) => {

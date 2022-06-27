@@ -70,7 +70,7 @@ const Turist: FunctionComponent<Props> = (props) => {
   const handleCreateTurist = async (values: PostTuristDto) => {
     setIsLoading(true);
     try {
-      const payload = Object.assign({}, { ...values, tipo: "T", isAdmin: false });
+      const payload = Object.assign({}, { ...values, tipo: "T", isAdmin: false, isActive: true });
       const res = await userService.createUser(payload);
       if (!res.access_token) {
         throw new Error("Erro no cadastro do Turista");
@@ -107,7 +107,7 @@ const Turist: FunctionComponent<Props> = (props) => {
   const handleDeleteTurist = async (turist: GetTuristDto) => {
     setIsLoading(true);
     try {
-      await turistService.deleteTurist(turist.id);
+      await turistService.patchTurist({ isActive: false }, turist.id);
       await getTurists();
       setOpenDetail(false);
       toast?.current?.show(toastSuccess('Turista excluído com sucesso'));
@@ -175,7 +175,7 @@ const Turist: FunctionComponent<Props> = (props) => {
         /> */}
         <Button
           icon="fas fa-pen"
-          className='p-button-outlined-gray p-button-xs ml-2'
+          className='p-button-secondary p-button-xs ml-2'
           tooltip="Detalhes"
           tooltipOptions={{ position: 'top' }}
           onClick={() => handleEdit(rowData)}
@@ -281,7 +281,7 @@ const Turist: FunctionComponent<Props> = (props) => {
       <div className="datatable-div mt-5">
         <DataTable
           dataKey='id'
-          data={turists}
+          data={turists.filter(g => g.isActive)}
           loading={isLoading}
           paginator
         >
@@ -294,11 +294,11 @@ const Turist: FunctionComponent<Props> = (props) => {
         </DataTable>
       </div>
 
-      <MapDialog
+      {/* <MapDialog
         header="Posição do Turista"
         openDialog={openMapDialog}
         onClose={() => setOpenMapDialog(false)}
-      />
+      /> */}
 
       <TuristForm
         turist={turist}
@@ -320,7 +320,7 @@ const Turist: FunctionComponent<Props> = (props) => {
         accept={() => handleDeleteTurist(turist)}
         onHide={() => setOpenConfirm(false)}
       />
-    </div >
+    </div>
   );
 };
 

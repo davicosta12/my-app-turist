@@ -29,7 +29,6 @@ const ContentWrapper: React.FunctionComponent<Props> = (props) => {
     {
       items: activeUser.isAdmin ? [
         { label: 'Home', icon: 'fa-solid fa-house', command: () => { navigate("/home"); setVisible(false); } },
-        { label: 'Localizações', icon: 'fa-solid fa-location-dot', command: () => { navigate("/locations"); setVisible(false); } },
         { label: 'Guia', icon: 'fa-solid fa-compass', command: () => { navigate("/guide"); setVisible(false); } },
         { label: 'Turista', icon: 'fa-solid fa-suitcase-rolling', command: () => { navigate("/turist"); setVisible(false); } },
         { label: 'Grupo', icon: 'fa-solid fa-people-group', command: () => { navigate("/group"); setVisible(false); } }
@@ -38,7 +37,6 @@ const ContentWrapper: React.FunctionComponent<Props> = (props) => {
         [
           { label: 'Home', icon: 'fa-solid fa-house', command: () => { navigate("/home"); setVisible(false); } },
           { label: 'Localizações', icon: 'fa-solid fa-location-dot', command: () => { navigate("/locations"); setVisible(false); } },
-          { label: 'Guia', icon: 'fa-solid fa-compass', command: () => { navigate("/guide"); setVisible(false); } }
         ]
     },
   ];

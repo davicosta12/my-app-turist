@@ -44,6 +44,7 @@ const Group: FunctionComponent<Props> = (props) => {
   const dispatch = useDispatch();
 
   const groups = useAppSelector((state: RootState) => state.params.groups);
+  const activeUser = useAppSelector((state: RootState) => state.params.activeUser);
 
   const [filterParams, setFilterParams] = useState<Params>({
     id: '',
@@ -68,7 +69,7 @@ const Group: FunctionComponent<Props> = (props) => {
   const handleCreateGroup = async (values: PostGroupDto) => {
     setIsLoading(true);
     try {
-      const payload = Object.assign({}, { ...values, idGrupo: groups.length + 1, turists: [] });
+      const payload = Object.assign({}, { ...values, guide: { ...group.guide, idGrupo: groups.length + 1 }, turists: [] });
       const patchGuide = Object.assign({}, { idGrupo: groups.length + 1 });
 
       await groupService.createGroup(payload);
@@ -173,7 +174,7 @@ const Group: FunctionComponent<Props> = (props) => {
         /> */}
         <Button
           icon="fas fa-pen"
-          className='p-button-outlined-gray p-button-xs ml-2'
+          className='p-button-secondary p-button-xs ml-2'
           tooltip="Detalhes"
           tooltipOptions={{ position: 'top' }}
           onClick={() => handleEdit(rowData)}
@@ -290,11 +291,11 @@ const Group: FunctionComponent<Props> = (props) => {
         </DataTable>
       </div>
 
-      <MapDialog
+      {/* <MapDialog
         header="Posição do Grupo"
         openDialog={openMapDialog}
         onClose={() => setOpenMapDialog(false)}
-      />
+      /> */}
 
       <GroupForm
         group={group}

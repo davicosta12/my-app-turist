@@ -68,7 +68,7 @@ const Guide: FunctionComponent<Props> = (props) => {
   const handleCreateGuide = async (values: GetGuideDto) => {
     setIsLoading(true);
     try {
-      const payload = Object.assign({}, { ...values, tipo: "G", isAdmin: false });
+      const payload = Object.assign({}, { ...values, tipo: "G", isAdmin: false, isActive: true });
       const res = await userService.createUser(payload);
       if (!res.access_token) {
         throw new Error("Erro no cadastro do Guia");
@@ -105,7 +105,8 @@ const Guide: FunctionComponent<Props> = (props) => {
   const handleDeleteGuide = async (guide: GetGuideDto) => {
     setIsLoading(true);
     try {
-      await guideService.deleteGuide(guide.id);
+      // await guideService.deleteGuide(guide.id);
+      await guideService.patchGuide({ isActive: false }, guide.id);
       await getGuides();
       setOpenDetail(false);
       toast?.current?.show(toastSuccess('Guia excluído com sucesso'));
@@ -173,7 +174,7 @@ const Guide: FunctionComponent<Props> = (props) => {
         /> */}
         <Button
           icon="fas fa-pen"
-          className='p-button-outlined-gray p-button-xs ml-2'
+          className='p-button-secondary p-button-xs ml-2'
           tooltip="Detalhes"
           tooltipOptions={{ position: 'top' }}
           onClick={() => handleEdit(rowData)}
@@ -277,7 +278,7 @@ const Guide: FunctionComponent<Props> = (props) => {
 
       <div className="datatable-div mt-5">
         <DataTable
-          data={guides}
+          data={guides.filter(g => g.isActive)}
           dataKey='id'
           loading={isLoading}
           paginator
@@ -293,11 +294,11 @@ const Guide: FunctionComponent<Props> = (props) => {
         </DataTable>
       </div>
 
-      <MapDialog
+      {/* <MapDialog
         header="Posição do Guia"
         openDialog={openMapDialog}
         onClose={() => setOpenMapDialog(false)}
-      />
+      /> */}
 
       <GuideForm
         guide={guide}
